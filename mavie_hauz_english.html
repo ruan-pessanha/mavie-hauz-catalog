@@ -465,13 +465,18 @@ body:has(.mvh-root){margin:0}
   .nav{display:none}
   .hamburger{display:flex}
   /* No celular a barra não comporta tudo: sem isto os ícones da direita
-     (carrinho e conta) são empurrados para fora da tela. */
-  .bar{padding:0 14px;gap:2px}
-  .brand{font-size:15px;margin-right:6px}
-  .brand svg{width:26px;height:18px}
+     (carrinho e conta) são empurrados para fora da tela — medido de
+     verdade num iPhone, não estimado. */
+  .bar{padding:0 10px;gap:0}
+  .brand{margin-right:4px;font-size:13px;gap:6px}
+  .brand svg{width:22px;height:16px}
   #themeBtn{display:none}
-  .currency{padding:8px 9px;gap:4px}
+  .search{margin-right:0}
+  .currency{padding:7px 7px;gap:2px;font-size:11.5px}
+  .currency svg{width:11px;height:11px}
   .cursym{display:none}
+  .iconbtn{width:34px}
+  .iconbtn svg{width:17px;height:17px}
 }
 @media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
 </style>
@@ -571,7 +576,7 @@ body:has(.mvh-root){margin:0}
     </button>
     <button class="brand" data-home>
       <svg viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 40 26 8l14 20"/><path d="M26 40V22"/><path d="M32 40 46 20l14 20"/><path d="M40 40V29h12v11"/></svg>
-      Mavie Hauz
+      <span class="brandtext">Mavie Hauz</span>
     </button>
     <nav class="nav" id="nav"></nav>
     <div class="tools">
@@ -1158,13 +1163,11 @@ const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelecto
    primeiro par conhecido — nunca uma taxa inventada. */
 const CUR=(()=>{try{const c=new URLSearchParams(location.search).get('currency');
   return c&&/^[a-zA-Z]{3}$/.test(c)?c.toUpperCase():'USD';}catch(e){return 'USD';}})();
-let FX=1,FX_READY=CUR==='USD'; /* USD -> CUR, vinda dos preços reais da Wix */
-/* usd() só FORMATA: os valores em P já são mantidos na moeda de exibição.
-   Em moeda estrangeira, antes de sabermos a taxa real da Wix mostramos um
-   traço — melhor do que exibir por um instante um valor em dólar com o
-   símbolo de outra moeda. */
+/* usd() só FORMATA. O valor exibido é sempre o que veio da própria Wix;
+   enquanto não chegou, mostramos um traço — nunca o preço do arquivo, que
+   pode estar defasado em relação ao da loja. */
 const usd=n=>{
-  if(!FX_READY)return '—';
+  if(n==null||!isFinite(n))return '—';
   try{return new Intl.NumberFormat(undefined,{style:'currency',currency:CUR}).format(n);}
   catch(e){return '$'+Number(n).toFixed(2);}};
 /* abre a loja real numa aba nova — mais confiável que navegar a aba atual */
@@ -1382,13 +1385,9 @@ const navOf=k=>NAV.find(n=>n.k===k);
 const LIVE_KEY='mavieLivePrices_'+CUR; /* cache separado por moeda */
 const livePrices=(()=>{try{return JSON.parse(sessionStorage.getItem(LIVE_KEY)||'{}');}catch(e){return{};}})();
 function saveLivePrices(){try{sessionStorage.setItem(LIVE_KEY,JSON.stringify(livePrices));}catch(e){}}
-/* Preços em cache já estão na moeda ativa — aplica antes da primeira
-   renderização, e com isso já dá pra derivar a taxa sem esperar a rede. */
-P.forEach(p=>{const c=livePrices[p.id];
-  if(c!=null){p.price=c;
-    if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=c/p.usdPrice;
-      if(r>0&&isFinite(r)&&(r<0.98||r>1.02)){FX=r;FX_READY=true;}}}});
-if(CUR!=='USD'&&FX_READY)P.forEach(p=>{if(livePrices[p.id]==null)p.price=p.usdPrice*FX;});
+/* O preço exibido vem sempre da Wix. Começa vazio e é preenchido pelo
+   cache da sessão (já na moeda ativa) ou pela busca ao vivo. */
+P.forEach(p=>{const c=livePrices[p.id];p.price=(c!=null)?c:null;});
 let _priceReqSeq=0;
 const _pricePending={};
 window.addEventListener('message',e=>{
@@ -1397,7 +1396,56 @@ window.addEventListener('message',e=>{
   _pricePending[d.reqId](d.price);
   delete _pricePending[d.reqId];
 });
-function fetchLivePrice(slug){
+/* Busca o preço real na página do produto.
+
+   Rodando como Custom Code, o catálogo está no mesmo domínio da loja, então
+   dá para buscar direto — sem a ponte de postMessage (que era necessária
+   apenas quando isto vivia num iframe de outro domínio).
+
+   A fonte é a meta tag Open Graph, que traz o preço DE VENDA e a moeda:
+     <meta property="product:price:amount"   content="559.51">
+     <meta property="product:price:currency" content="BRL">
+   O JSON-LD desta loja vem vazio, e o campo "price" do HTML é o preço
+   cheio (riscado) — nenhum dos dois serve. */
+const SAME_ORIGIN=(()=>{try{return window.parent===window||location.origin===new URL(STORE_URL).origin;}catch(e){return false;}})();
+
+async function fetchDirectPrice(slug){
+  const q=CUR==='USD'?'':'?currency='+CUR;
+  /* Cada página de produto pesa ~2 MB, mas a tag de preço fica logo nos
+     primeiros ~130 KB. Lê em pedaços e para assim que achar — cancelando
+     o resto — em vez de baixar a página inteira. No mobile isso é a
+     diferença entre alguns KB e o site inteiro travando. */
+  const LIMIT=260000;
+  let ctrl;
+  try{
+    ctrl=new AbortController();
+    const res=await fetch('/product-page/'+slug+q,{cache:'no-store',signal:ctrl.signal});
+    if(!res.ok||!res.body)return null;
+    const reader=res.body.getReader();
+    const dec=new TextDecoder();
+    let html='',amt=null,cur=null;
+    while(true){
+      const {done,value}=await reader.read();
+      if(value)html+=dec.decode(value,{stream:true});
+      amt=html.match(/property="product:price:amount"\s+content="([\d.]+)"/);
+      cur=html.match(/property="product:price:currency"\s+content="([A-Z]{3})"/);
+      if(amt&&cur)break;
+      if(done||html.length>LIMIT)break;
+    }
+    ctrl.abort();
+    if(!amt)return null;
+    /* Só aceita se a Wix devolveu na moeda pedida — evita mostrar dólar
+       com símbolo de real caso a conversão falhe. */
+    if(cur&&cur[1]!==CUR)return null;
+    const p=parseFloat(amt[1]);
+    return isFinite(p)&&p>0?p:null;
+  }catch(e){
+    try{ctrl&&ctrl.abort();}catch(e2){}
+    return null;
+  }
+}
+
+function fetchBridgePrice(slug){
   return new Promise(resolve=>{
     const reqId=++_priceReqSeq;
     const timer=setTimeout(()=>{delete _pricePending[reqId];resolve(null);},6000);
@@ -1406,36 +1454,53 @@ function fetchLivePrice(slug){
     catch(e){clearTimeout(timer);delete _pricePending[reqId];resolve(null);}
   });
 }
-async function syncLivePrices(){
-  const ids=Object.keys(WIX_SLUG);
-  /* Anexa a moeda ao slug: a ponte monta '/product-page/'+slug, então o
-     fetch vira '/product-page/SLUG?currency=BRL' e a Wix devolve o preço
-     já convertido. Sem isso o preço volta sempre em dólar. */
-  const q=CUR==='USD'?'':'?currency='+CUR;
-  const results=await Promise.all(ids.map(id=>fetchLivePrice(WIX_SLUG[id]+q)));
-  let changed=false;
-  ids.forEach((id,i)=>{
-    const price=results[i];
-    if(price==null)return;
-    if(livePrices[id]!==price){livePrices[id]=price;changed=true;}
-    const p=P.find(x=>x.id===id);
-    if(p){
-      p.price=price; /* já vem na moeda ativa, convertido pela própria Wix */
-      /* deriva a taxa real a partir do primeiro par (USD original x valor Wix) */
-      /* Trava: taxa ~1 em moeda estrangeira significa que a Wix devolveu
-         dólar (conversão falhou). Nesse caso não marcamos a taxa como
-         pronta — melhor mostrar "—" do que dólar com símbolo errado. */
-      if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=price/p.usdPrice;
-        if(r>0&&isFinite(r)&&(r<0.98||r>1.02)){FX=r;FX_READY=true;}}
-    }
-  });
-  /* converte os que ainda não receberam preço ao vivo, usando a taxa real */
-  if(CUR!=='USD'&&FX_READY){
-    P.forEach(p=>{if(livePrices[p.id]==null)p.price=p.usdPrice*FX;});
-  }
-  if(changed)saveLivePrices();
-  refreshVisibleGrids();
+
+function fetchLivePrice(slug){
+  return SAME_ORIGIN?fetchDirectPrice(slug):fetchBridgePrice(slug);
 }
+/* Busca preços apenas dos produtos que estão na tela, em lotes pequenos.
+
+   Antes isto buscava os 116 produtos de uma vez. Cada página de produto da
+   Wix tem ~2 MB, então eram ~230 MB por carregamento — o que deixava o site
+   lento e disparava "429 Too Many Requests" no servidor.
+
+   Também não estimamos mais preço a partir de uma taxa de câmbio: o preço
+   base do arquivo pode estar defasado em relação à loja (um item marcado
+   como US$ 59,99 aqui já custava US$ 109,99 na Wix). Preço que ainda não
+   chegou aparece como "—" até a Wix responder — melhor um traço do que um
+   valor que não bate com o do checkout. */
+const FETCH_CONCURRENCY=4;
+let _syncing=false;
+
+async function syncPricesFor(ids){
+  const pending=ids.filter(id=>WIX_SLUG[id]&&livePrices[id]==null);
+  if(!pending.length||_syncing)return;
+  _syncing=true;
+  let changed=false;
+  try{
+    for(let i=0;i<pending.length;i+=FETCH_CONCURRENCY){
+      const lote=pending.slice(i,i+FETCH_CONCURRENCY);
+      const results=await Promise.all(lote.map(id=>fetchLivePrice(WIX_SLUG[id])));
+      lote.forEach((id,j)=>{
+        const price=results[j];
+        if(price==null)return;
+        if(livePrices[id]!==price){livePrices[id]=price;changed=true;}
+        const p=P.find(x=>x.id===id);
+        if(p)p.price=price; /* já vem na moeda ativa, convertido pela Wix */
+      });
+      if(changed)refreshVisibleGrids();
+    }
+  }finally{
+    _syncing=false;
+    if(changed)saveLivePrices();
+  }
+}
+
+/* IDs atualmente renderizados em qualquer grade visível */
+function visibleIds(){
+  return [...new Set($$('[data-open]').map(el=>el.dataset.open))];
+}
+function syncVisiblePrices(){syncPricesFor(visibleIds());}
 function refreshVisibleGrids(){
   const vHome=$('#v-home'),vCat=$('#v-cat');
   if(vHome&&!vHome.hidden){const h=$('#gridHome');if(h)fill(h,P.filter(p=>p.flag==='HOT').slice(0,8));}
@@ -1452,7 +1517,11 @@ const card=p=>`<article class="card"><button data-open="${p.id}" style="display:
   <div class="cbody" style="padding-top:0;flex:none"><div class="cfoot">
     <span class="price">${p.was?`<s>${usd(p.was)}</s>`:''}${usd(p.price)}</span>
     <button class="add" data-add="${p.id}">Add</button></div></div></article>`;
-const fill=(el,list)=>el.innerHTML=list.length?list.map(card).join(''):'<p class="empty">No products match those filters.</p>';
+const fill=(el,list)=>{
+  el.innerHTML=list.length?list.map(card).join(''):'<p class="empty">No products match those filters.</p>';
+  /* pede à Wix o preço dos itens que acabaram de entrar na tela */
+  if(typeof syncVisiblePrices==='function')setTimeout(syncVisiblePrices,0);
+};
 
 /* ============ NAV + MEGA MENU ============ */
 $('#nav').innerHTML=NAV.map(n=>`<button class="navb" data-nav="${n.k}" aria-expanded="false">${n.n}</button>`).join('')
@@ -1559,10 +1628,17 @@ function buildToolbar(){
 function renderCat(){
   let list=pool().filter(p=>cur.brand==='all'||p.brand===cur.brand);
   const s=cur.sort;
-  if(s==='low')list=[...list].sort((a,b)=>a.price-b.price);
-  if(s==='high')list=[...list].sort((a,b)=>b.price-a.price);
+  /* itens sem preço ainda carregado vão para o fim, em vez de virar NaN */
+  const pv=x=>(x.price==null||!isFinite(x.price))?null:x.price;
+  const bySort=(a,b,dir)=>{const A=pv(a),B=pv(b);
+    if(A==null&&B==null)return 0; if(A==null)return 1; if(B==null)return -1;
+    return dir==='low'?A-B:B-A;};
+  if(s==='low')list=[...list].sort((a,b)=>bySort(a,b,'low'));
+  if(s==='high')list=[...list].sort((a,b)=>bySort(a,b,'high'));
   if(s==='rate')list=[...list].sort((a,b)=>b.rate-a.rate);
-  if(s==='save')list=[...list].sort((a,b)=>((b.was||b.price)-b.price)-((a.was||a.price)-a.price));
+  if(s==='save')list=[...list].sort((a,b)=>{
+    const sv=x=>{const p=pv(x);return (p==null||!x.was)?-1:(x.was-p);};
+    return sv(b)-sv(a);});
   const PAGE_SIZE=12;
   const c=$('#catCount');if(c)c.textContent=list.length+' product'+(list.length===1?'':'s');
   const visList=cur.expanded?list:list.slice(0,PAGE_SIZE);
@@ -1652,7 +1728,7 @@ $('#cats').innerHTML=NAV.map(n=>`<button class="cat" data-nav="${n.k}"><svg fill
 $('#roomsGrid').innerHTML=ROOMS.map(r=>`<button class="room" data-roomgo="${r.k}">${r.n}
   <span>${P.filter(p=>p.rooms.includes(r.k)).length} products</span></button>`).join('');
 fill($('#gridHome'),P.filter(p=>p.flag==='HOT').slice(0,8));
-syncLivePrices();
+syncVisiblePrices();
 $('#footGrid').innerHTML=`<div><div class="brand" style="margin-bottom:12px">
     <svg viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 40 26 8l14 20"/><path d="M26 40V22"/><path d="M32 40 46 20l14 20"/><path d="M40 40V29h12v11"/></svg>Mavie Hauz</div>
     <p style="margin:0;max-width:32ch">Smart living, beautifully designed. ${P.length} curated device${P.length===1?'':'s'}, picked one at a time.</p></div>`
@@ -1719,7 +1795,9 @@ function renderCart(){
         <div class="miniqty"><button data-dec="${id}" aria-label="Decrease">−</button><span>${q}</span><button data-inc="${id}" aria-label="Increase">+</button></div></div>
       <div class="pr">${usd(p.price*q)}</div></div>`}).join('') : '<p class="empty">Your cart is empty.</p>';
   const FREE_SHIP_MIN=200;
-  const sub=[...cart].reduce((a,[id,q])=>a+P.find(x=>x.id===id).price*q,0);
+  const sub=[...cart].reduce((a,[id,q])=>{
+    const pr=P.find(x=>x.id===id)?.price;
+    return a+((pr==null||!isFinite(pr))?0:pr*q);},0);
   const freeShip=sub>=FREE_SHIP_MIN;
   $('#sub').textContent=usd(sub);
   $('#ship').textContent=sub===0?'—':(freeShip?'Free':'At checkout');
