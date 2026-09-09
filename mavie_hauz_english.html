@@ -464,6 +464,14 @@ body:has(.mvh-root){margin:0}
   .dev:nth-child(3){border-right:0}
   .nav{display:none}
   .hamburger{display:flex}
+  /* No celular a barra não comporta tudo: sem isto os ícones da direita
+     (carrinho e conta) são empurrados para fora da tela. */
+  .bar{padding:0 14px;gap:2px}
+  .brand{font-size:15px;margin-right:6px}
+  .brand svg{width:26px;height:18px}
+  #themeBtn{display:none}
+  .currency{padding:8px 9px;gap:4px}
+  .cursym{display:none}
 }
 @media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
 </style>
@@ -570,7 +578,7 @@ body:has(.mvh-root){margin:0}
       <label class="search"><svg><use href="#i-search"/></svg>
         <input id="q" type="search" placeholder="Search products" aria-label="Search products"></label>
       <div class="menuwrap">
-        <button class="currency" id="currencyBtn" aria-haspopup="true" aria-expanded="false"><span id="curLabel">USD ($)</span><svg><use href="#i-chevron"/></svg></button>
+        <button class="currency" id="currencyBtn" aria-haspopup="true" aria-expanded="false"><span id="curLabel">USD</span><span class="cursym" id="curSym"> ($)</span><svg><use href="#i-chevron"/></svg></button>
         <div class="dropmenu" id="currencyMenu" hidden></div>
       </div>
       <button class="iconbtn" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon"><use href="#i-moon"/></svg></button>
@@ -1378,7 +1386,8 @@ function saveLivePrices(){try{sessionStorage.setItem(LIVE_KEY,JSON.stringify(liv
    renderização, e com isso já dá pra derivar a taxa sem esperar a rede. */
 P.forEach(p=>{const c=livePrices[p.id];
   if(c!=null){p.price=c;
-    if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=c/p.usdPrice;if(r>0&&isFinite(r)){FX=r;FX_READY=true;}}}});
+    if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=c/p.usdPrice;
+      if(r>0&&isFinite(r)&&(r<0.98||r>1.02)){FX=r;FX_READY=true;}}}});
 if(CUR!=='USD'&&FX_READY)P.forEach(p=>{if(livePrices[p.id]==null)p.price=p.usdPrice*FX;});
 let _priceReqSeq=0;
 const _pricePending={};
@@ -1399,7 +1408,11 @@ function fetchLivePrice(slug){
 }
 async function syncLivePrices(){
   const ids=Object.keys(WIX_SLUG);
-  const results=await Promise.all(ids.map(id=>fetchLivePrice(WIX_SLUG[id])));
+  /* Anexa a moeda ao slug: a ponte monta '/product-page/'+slug, então o
+     fetch vira '/product-page/SLUG?currency=BRL' e a Wix devolve o preço
+     já convertido. Sem isso o preço volta sempre em dólar. */
+  const q=CUR==='USD'?'':'?currency='+CUR;
+  const results=await Promise.all(ids.map(id=>fetchLivePrice(WIX_SLUG[id]+q)));
   let changed=false;
   ids.forEach((id,i)=>{
     const price=results[i];
@@ -1409,8 +1422,11 @@ async function syncLivePrices(){
     if(p){
       p.price=price; /* já vem na moeda ativa, convertido pela própria Wix */
       /* deriva a taxa real a partir do primeiro par (USD original x valor Wix) */
+      /* Trava: taxa ~1 em moeda estrangeira significa que a Wix devolveu
+         dólar (conversão falhou). Nesse caso não marcamos a taxa como
+         pronta — melhor mostrar "—" do que dólar com símbolo errado. */
       if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=price/p.usdPrice;
-        if(r>0&&isFinite(r)){FX=r;FX_READY=true;}}
+        if(r>0&&isFinite(r)&&(r<0.98||r>1.02)){FX=r;FX_READY=true;}}
     }
   });
   /* converte os que ainda não receberam preço ao vivo, usando a taxa real */
@@ -1736,7 +1752,7 @@ if(WIX_MODE){
 const CURRENCIES=[['USD','$'],['EUR','€'],['GBP','£'],['BRL','R$'],['CAD','C$'],['AUD','AU$'],['MXN','$'],['JPY','¥']];
 const ACCOUNT_LINKS=[['My Orders','/my-orders'],['My Wishlist','/my-wishlist'],['Account Settings','/account-settings']];
 
-function curLabel(code){const f=CURRENCIES.find(c=>c[0]===code);return f?`${f[0]} (${f[1]})`:code;}
+function curSymbol(code){const f=CURRENCIES.find(c=>c[0]===code);return f?f[1]:'';}
 function goCurrency(code){
   const u=new URL(location.href);
   u.searchParams.set('currency',code);
@@ -1759,7 +1775,8 @@ function toggleMenu(menuSel,btnSel){
   btn.setAttribute('aria-expanded',String(willOpen));
 }
 (function initHeaderMenus(){
-  const cl=$('#curLabel');if(cl)cl.textContent=curLabel(CUR);
+  const cl=$('#curLabel');if(cl)cl.textContent=CUR;
+  const cs=$('#curSym');if(cs)cs.textContent=' ('+curSymbol(CUR)+')';
   const cm=$('#currencyMenu');
   if(cm){
     cm.innerHTML=CURRENCIES.map(([code,sym])=>
