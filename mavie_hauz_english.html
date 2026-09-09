@@ -107,6 +107,9 @@ body:has(.mvh-root){margin:0}
 .iconbtn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;position:relative;transition:background .15s}
 .iconbtn:hover{background:var(--sunk)}
 .iconbtn svg{width:19px;height:19px}
+.currency{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:13px;font-weight:700;color:var(--ink-2);white-space:nowrap;transition:background .15s}
+.currency:hover{background:var(--sunk)}
+.currency svg{width:13px;height:13px;opacity:.6}
 .badge{position:absolute;top:3px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-family:var(--mono);font-size:10px;font-weight:700;display:grid;place-items:center}
 
 .mega{position:absolute;left:0;right:0;top:100%;z-index:49;overflow:hidden;
@@ -489,6 +492,8 @@ body:has(.mvh-root){margin:0}
 <symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 11.4a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.3L21 8H6"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17.5" cy="20" r="1.3"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.4 5.4l1.4 1.4M17.2 17.2l1.4 1.4M18.6 5.4l-1.4 1.4M6.8 17.2l-1.4 1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M4.8 20c1-3.6 4-5.6 7.2-5.6s6.2 2 7.2 5.6"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></symbol>
 <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6h10v10h-10z"/><path d="M12.5 9.5h4l3 3v3.5h-7z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="16.5" cy="18.5" r="1.6"/></symbol>
 <symbol id="i-money" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2A2.8 2.8 0 0 0 12 8c-1.6 0-2.6.8-2.6 1.9 0 2.8 5.6 1.3 5.6 4.2 0 1.2-1.1 2-2.9 2a3 3 0 0 1-2.6-1.3M12 6.4v11.2"/></symbol>
@@ -555,8 +560,10 @@ body:has(.mvh-root){margin:0}
     <div class="tools">
       <label class="search"><svg><use href="#i-search"/></svg>
         <input id="q" type="search" placeholder="Search products" aria-label="Search products"></label>
+      <button class="currency" id="currencyBtn" aria-label="Currency: USD">USD ($)<svg><use href="#i-chevron"/></svg></button>
       <button class="iconbtn" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon"><use href="#i-moon"/></svg></button>
       <button class="iconbtn" id="openCart" aria-label="Open cart"><svg><use href="#i-cart"/></svg><span class="badge" id="cartN" hidden>0</span></button>
+      <button class="iconbtn" id="accountBtn" aria-label="Account"><svg><use href="#i-user"/></svg></button>
     </div>
   </div>
   <div class="mega" id="mega" hidden></div>
