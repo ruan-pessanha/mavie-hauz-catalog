@@ -1,0 +1,1865 @@
+<title>Mavie Hauz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F7F7F9; --surface:#FFFFFF; --sunk:#F1F0F5;
+  --ink:#12131A; --ink-2:#43424F; --muted:#787689; --line:#E6E4EC; --line-2:#D6D3E0;
+  --accent:#6D28D9; --accent-soft:#F1EBFE; --accent-ink:#5B21B6;
+  --good:#0F9D6E; --good-soft:#E7F6F0; --warn:#B45309; --hot:#DC2626; --hot-soft:#FEECEC;
+  --on-accent:#FFFFFF;
+  --display:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Manrope',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --shadow:0 1px 2px rgba(18,19,26,.04),0 8px 24px rgba(18,19,26,.06);
+  --shadow-lg:0 12px 48px rgba(18,19,26,.14);
+  --r:12px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D0D12; --surface:#15151C; --sunk:#101017;
+  --ink:#EFEDF5; --ink-2:#C3BFD2; --muted:#8B87A0; --line:#26252F; --line-2:#33323F;
+  --accent:#A78BFA; --accent-soft:#241C3B; --accent-ink:#C4B5FD;
+  --good:#34D399; --good-soft:#122A22; --warn:#FBBF24; --hot:#F87171; --hot-soft:#2A1616;
+  --on-accent:#12131A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 12px 48px rgba(0,0,0,.55);
+}}
+:root[data-theme="dark"]{
+  --bg:#0D0D12; --surface:#15151C; --sunk:#101017;
+  --ink:#EFEDF5; --ink-2:#C3BFD2; --muted:#8B87A0; --line:#26252F; --line-2:#33323F;
+  --accent:#A78BFA; --accent-soft:#241C3B; --accent-ink:#C4B5FD;
+  --good:#34D399; --good-soft:#122A22; --warn:#FBBF24; --hot:#F87171; --hot-soft:#2A1616;
+  --on-accent:#12131A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 12px 48px rgba(0,0,0,.55);
+}
+/* Tudo escopado em .mvh-root — este código roda direto no DOM real da Wix
+   (não é iframe isolado), então qualquer seletor de tag "solta" (body, header,
+   footer, a, button, section, select...) vaza e quebra o site real. */
+:where(.mvh-root),:where(.mvh-root) *{box-sizing:border-box}
+body:has(.mvh-root){margin:0}
+.mvh-root{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  display:flex;flex-direction:column;min-height:100vh;
+  /* sangria total: ignora a largura que o bloco da Wix reservou e sempre
+     ocupa a tela inteira, mesmo se o "esticar" do editor não pegar */
+  width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);overflow-x:hidden}
+:where(.mvh-root) main{flex:1 0 auto}
+:where(.mvh-root) footer{margin-top:auto}
+:where(.mvh-root h1),:where(.mvh-root h2),:where(.mvh-root h3),:where(.mvh-root h4){font-family:var(--display);margin:0;font-weight:800;letter-spacing:-.025em;text-wrap:balance;line-height:1.12}
+:where(.mvh-root) button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:where(.mvh-root) input,:where(.mvh-root) select{font:inherit;color:inherit}
+:where(.mvh-root) a{color:inherit;text-decoration:none}
+.mvh-root .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+.mvh-root .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.mvh-root .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.mvh-root :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.mvh-root [hidden]{display:none!important}
+
+/* ---------- announcement ---------- */
+.ann{background:var(--ink);color:var(--bg);padding:9px 0;font-size:12.5px;overflow:hidden}
+.anntrack{display:flex;width:max-content;animation:annScroll 24s linear infinite}
+.ann:hover .anntrack{animation-play-state:paused}
+.anninner{display:flex;gap:36px;padding:0 18px;flex:none}
+.anninner span{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.anninner svg{width:14px;height:14px;opacity:.85}
+@keyframes annScroll{from{transform:translateX(0)}to{transform:translateX(-16.6667%)}}
+
+/* ---------- hamburger + mobile drawer ---------- */
+.hamburger{display:none;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;flex:none}
+.hamburger:hover{background:var(--sunk)}
+.hamburger svg{width:20px;height:20px}
+.mobilescrim{position:fixed;inset:0;background:rgba(5,3,10,.55);backdrop-filter:blur(2px);z-index:80}
+.mobiledrawer{position:fixed;top:0;left:0;bottom:0;width:min(320px,84vw);z-index:81;display:flex;flex-direction:column;
+  background:rgba(11,7,20,.86);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
+  box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden}
+.mobiledrawer::before{content:"";position:absolute;top:-120px;left:-60px;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.32) 0%,transparent 68%);filter:blur(8px);pointer-events:none}
+.mobiledrawer::after{content:"";position:absolute;bottom:-140px;right:-60px;width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(236,72,153,.22) 0%,transparent 68%);filter:blur(8px);pointer-events:none}
+.mobiledrawer .mdhead{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:18px;
+  border-bottom:1px solid rgba(255,255,255,.09);font-family:var(--display);font-weight:800;font-size:16px;color:#fff}
+.mobiledrawer .mdclose{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#C9C3DC}
+.mobiledrawer .mdclose:hover{background:rgba(168,85,247,.16);color:#fff}
+.mobiledrawer .mdclose svg{width:20px;height:20px}
+.mobiledrawer .mdlist{position:relative;z-index:1;flex:1;overflow-y:auto;padding:10px}
+.mobiledrawer .mdbtn{display:block;width:100%;text-align:left;padding:13px 12px;border-radius:9px;font-size:15px;font-weight:600;color:#DCD6EC;transition:background .14s,color .14s}
+.mobiledrawer .mdbtn:hover{background:rgba(168,85,247,.16);color:#fff}
+.mobiledrawer .mdbtn.deal{color:#FF8A8A}
+
+/* ---------- header + mega menu ---------- */
+:where(.mvh-root) header{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:6px;height:66px;max-width:1280px;margin:0 auto;padding:0 28px}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:17px;white-space:nowrap;margin-right:16px}
+.brand svg{width:30px;height:21px;color:var(--accent)}
+.nav{display:flex;align-items:center;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;
+  mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
+.nav::-webkit-scrollbar{display:none}
+.navb{padding:8px 10px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-2);white-space:nowrap;position:relative;transition:background .15s,color .15s}
+.navb:hover{background:var(--sunk);color:var(--ink)}
+.navb[aria-expanded="true"],.navb[data-active="true"],.navb[aria-current="true"]{color:var(--accent);background:var(--accent-soft)}
+.navb.deal{color:var(--hot)}
+.tools{display:flex;align-items:center;gap:6px;margin-left:auto}
+.search{display:flex;align-items:center;gap:8px;background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:8px 12px;width:150px;transition:width .2s,border-color .2s}
+.search:focus-within{border-color:var(--accent);width:210px}
+.search input{border:0;background:none;outline:0;width:100%;font-size:14px}
+.search svg{width:15px;height:15px;color:var(--muted);flex:none}
+.iconbtn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;position:relative;transition:background .15s}
+.iconbtn:hover{background:var(--sunk)}
+.iconbtn svg{width:19px;height:19px}
+.badge{position:absolute;top:3px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-family:var(--mono);font-size:10px;font-weight:700;display:grid;place-items:center}
+
+.mega{position:absolute;left:0;right:0;top:100%;z-index:49;overflow:hidden;
+  background:rgba(11,7,20,.82);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
+  border-bottom:1px solid rgba(168,85,247,.28);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.mega::before{content:"";position:absolute;top:-140px;left:8%;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.32) 0%,transparent 68%);filter:blur(10px);pointer-events:none}
+.mega::after{content:"";position:absolute;bottom:-160px;right:6%;width:380px;height:380px;border-radius:50%;
+  background:radial-gradient(circle,rgba(236,72,153,.22) 0%,transparent 68%);filter:blur(10px);pointer-events:none}
+.megainner{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:26px 28px 30px;display:grid;grid-template-columns:236px 1fr;gap:36px}
+.subcol{display:flex;flex-direction:column;gap:1px;border-right:1px solid rgba(255,255,255,.09);padding-right:20px}
+.subcol button{text-align:left;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:600;color:#C9C3DC;display:flex;align-items:center;gap:9px;transition:background .14s,color .14s;position:relative}
+.subcol button:hover{background:rgba(168,85,247,.14);color:#fff}
+.subcol .tagx{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:4px;background:rgba(220,38,38,.22);color:#FF8A8A}
+.subcol .tagx.new{background:rgba(168,85,247,.22);color:#D8B4FE}
+.subcol .allbtn{margin-top:10px;justify-content:center;box-shadow:inset 0 0 0 1px rgba(168,85,247,.5);color:#D8B4FE;font-weight:700}
+.subcol .allbtn:hover{background:rgba(168,85,247,.16);box-shadow:inset 0 0 0 1px rgba(168,85,247,.8)}
+.megagrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-content:start}
+.mprod{display:flex;align-items:center;gap:13px;padding:11px;border-radius:10px;text-align:left;transition:background .14s,transform .14s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.mprod:hover{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.35);transform:translateY(-2px)}
+.mprod .mp{width:56px;height:56px;border-radius:9px;background:linear-gradient(150deg,rgba(168,85,247,.18),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);display:grid;place-items:center;flex:none;color:#D8B4FE}
+.mprod .mp svg{width:27px;height:27px;stroke-width:1.1}
+.mprod .mn{font-size:13.5px;font-weight:600;line-height:1.35;color:#EDE7F8}
+.mprod .mf{font-family:var(--mono);font-size:10px;font-weight:700;color:#FF8A8A;letter-spacing:.05em;display:block;margin-bottom:2px}
+.mprod .mpr{font-family:var(--mono);font-size:12.5px;color:#9A93B0;margin-top:3px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;padding:72px 0;
+  background:
+    linear-gradient(100deg,rgba(6,4,12,.92) 0%,rgba(6,4,12,.72) 38%,rgba(6,4,12,.28) 68%,rgba(6,4,12,.08) 100%),
+    url('https://static.wixstatic.com/media/6e512a_bbe680134af545e4ab992805c215d01e~mv2.webp/v1/fill/w_1024,h_1024,al_c,q_80,enc_auto/6e512a_bbe680134af545e4ab992805c215d01e~mv2.webp');
+  background-size:cover;background-position:center 35%}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero .pill{background:rgba(255,255,255,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);backdrop-filter:blur(6px)}
+.hero .pill svg{color:#4ADE80}
+.hero h1{font-size:clamp(36px,5vw,56px);margin:16px 0 20px;color:#fff;text-shadow:0 2px 24px rgba(0,0,0,.3)}
+.hero p{color:rgba(255,255,255,.78);font-size:17px;max-width:44ch;margin:0 0 28px}
+.hero .btn.ghost{color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.hero .btn.ghost:hover{background:rgba(255,255,255,.12)}
+@media(max-width:940px){.hero{padding:44px 0;
+  background-position:center 30%,center;
+  background-image:linear-gradient(180deg,rgba(6,4,12,.55) 0%,rgba(6,4,12,.88) 70%,rgba(6,4,12,.96) 100%),
+    url('https://static.wixstatic.com/media/6e512a_bbe680134af545e4ab992805c215d01e~mv2.webp/v1/fill/w_860,h_1024,al_c,q_80,enc_auto/6e512a_bbe680134af545e4ab992805c215d01e~mv2.webp')}
+  .hero .wrap{grid-template-columns:1fr}}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:10px;font-weight:700;font-size:15px;background:var(--accent);color:var(--on-accent);transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.ghost{background:none;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+.btn.ghost:hover{background:var(--sunk);filter:none}
+.btn.block{width:100%}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:var(--good-soft);color:var(--good);font-size:12.5px;font-weight:700}
+.pill svg{width:13px;height:13px}
+
+.roomcard{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14);
+  background:rgba(15,10,25,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.roomcard .scenes,.roomcard .devrow{border-top-color:rgba(255,255,255,.12)}
+.roomcard .scene{color:rgba(255,255,255,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.roomcard .scene:hover{background:rgba(255,255,255,.1)}
+.roomcard .dev{border-right-color:rgba(255,255,255,.12)}
+.roomcard .dev .n{color:rgba(255,255,255,.5)}
+.roomcard .dev[data-on="true"] .n{color:#fff}
+.roomcard .dev:hover{background:rgba(255,255,255,.06)}
+.roomview{position:relative;height:262px;background:linear-gradient(165deg,#1A1726,#0E0C16);overflow:hidden}
+.wash{position:absolute;inset:0;transition:background 1s ease;background:radial-gradient(115% 78% at 50% 112%,var(--wA) 0%,transparent 60%),radial-gradient(62% 48% at 14% 6%,var(--wB) 0%,transparent 56%)}
+.cove{position:absolute;left:9%;right:9%;top:32px;height:4px;border-radius:3px;background:var(--wA);filter:blur(6px);transition:background 1s}
+.roomhud{position:absolute;left:22px;top:20px;color:#F4F1FA}
+.roomhud .t{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
+.roomhud .g{font-size:12.5px;opacity:.72;margin-top:4px}
+.roomtemp{position:absolute;right:22px;top:20px;text-align:right;color:#F4F1FA}
+.roomtemp .t{font-family:var(--mono);font-size:19px;font-weight:700}
+.roomtemp .l{font-size:11px;opacity:.66}
+.scenes{display:flex;gap:8px;padding:15px;border-top:1px solid var(--line);flex-wrap:wrap}
+.scene{padding:8px 15px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line-2);transition:all .16s}
+.scene:hover{background:var(--sunk)}
+.scene[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);box-shadow:none}
+.devrow{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line)}
+.dev{padding:12px 6px;text-align:center;border-right:1px solid var(--line)}
+.dev:last-child{border-right:0}
+.dev svg{width:18px;height:18px;color:var(--muted);transition:color .18s}
+.dev[data-on="true"] svg{color:var(--accent)}
+.dev .n{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
+.dev[data-on="true"] .n{color:var(--ink)}
+
+/* ---------- sections ---------- */
+:where(.mvh-root) section{padding:56px 0}
+.sechead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px;flex-wrap:wrap}
+.sechead h2{font-size:clamp(25px,3vw,34px)}
+.sechead p{color:var(--muted);margin:8px 0 0;font-size:15px}
+.link{color:var(--accent);font-weight:700;font-size:14px}
+.link:hover{text-decoration:underline}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:14px}
+.cat{padding:22px;border-radius:var(--r);background:var(--surface);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));text-align:left;transition:border-color .18s,transform .18s,box-shadow .18s;
+  box-shadow:0 4px 20px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.cat:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 26px -8px color-mix(in srgb,var(--accent) 55%,transparent)}
+.cat svg{width:25px;height:25px;color:var(--accent)}
+.cat h3{font-size:16px;margin:13px 0 5px}
+.cat p{color:var(--muted);font-size:13px;margin:0}
+.cat .c{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:11px;display:block}
+.rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.room{padding:18px;border-radius:var(--r);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--surface);text-align:left;font-weight:700;font-size:14.5px;transition:all .18s;
+  box-shadow:0 4px 20px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.room:hover{border-color:var(--accent);color:var(--accent);box-shadow:0 8px 26px -8px color-mix(in srgb,var(--accent) 55%,transparent)}
+.room span{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;margin-top:4px}
+
+.cathero{border-radius:20px;overflow:hidden;min-height:260px;margin-bottom:24px;position:relative;
+  display:flex;align-items:flex-end;padding:26px 30px;background-size:cover;background-position:center 40%}
+.cathero h3{color:#fff;font-size:23px;font-family:var(--display);font-weight:800;text-shadow:0 2px 16px rgba(0,0,0,.35)}
+@media(max-width:700px){.cathero{min-height:170px}}
+
+/* ---------- category layout ---------- */
+.shop{display:grid;grid-template-columns:224px 1fr;gap:34px;padding-top:26px}
+.shop.noside{grid-template-columns:1fr}
+.side{align-self:start;position:sticky;top:82px}
+.side h4{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:11px}
+.side button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:9px 12px;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink-2);transition:all .14s}
+.side button:hover{background:var(--sunk);color:var(--ink)}
+.side button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink)}
+.side .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:24px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line-2);transition:all .15s}
+.chip:hover{background:var(--sunk)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:none}
+:where(.mvh-root) select{margin-left:auto;padding:9px 13px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);font-size:13.5px;font-weight:600;cursor:pointer}
+.count{font-family:var(--mono);font-size:12.5px;color:var(--muted);width:100%}
+
+/* ---------- cards ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:20px}
+.card{display:flex;flex-direction:column;border-radius:var(--r);background:var(--surface);border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));overflow:hidden;transition:border-color .18s,box-shadow .18s,transform .18s;text-align:left;
+  box-shadow:0 4px 20px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.card:hover{border-color:var(--accent);box-shadow:var(--shadow),0 8px 26px -6px color-mix(in srgb,var(--accent) 55%,transparent);transform:translateY(-3px)}
+.plate{height:240px;display:grid;place-items:center;position:relative;background:linear-gradient(160deg,var(--sunk),var(--surface));border-bottom:1px solid var(--line);overflow:hidden}
+.plate svg{width:56px;height:56px;color:var(--ink);opacity:.82;stroke-width:1.1;position:relative;z-index:1;animation:float 5.4s ease-in-out infinite;transition:transform .3s}
+.plate img{width:100%;height:100%;object-fit:contain;padding:6px;position:relative;z-index:1;box-sizing:border-box}
+.plate.has-photo::after,.plate.has-photo::before{display:none}
+.plate::after{content:"";position:absolute;bottom:30px;width:52px;height:9px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(18,19,26,.26),transparent 72%);animation:floatShadow 5.4s ease-in-out infinite}
+:root[data-theme="dark"] .plate::after{background:radial-gradient(ellipse at center,rgba(0,0,0,.62),transparent 72%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .plate::after{background:radial-gradient(ellipse at center,rgba(0,0,0,.62),transparent 72%)}}
+.plate::before{content:"";position:absolute;width:132px;height:132px;border-radius:50%;
+  background:radial-gradient(circle,var(--accent-soft) 0%,transparent 68%);opacity:0;transition:opacity .35s}
+.card:hover .plate::before{opacity:1}
+.card:hover .plate svg{animation-play-state:paused;transform:translateY(-11px) scale(1.06)}
+.grid .card:nth-child(2n) .plate svg,.grid .card:nth-child(2n) .plate::after{animation-delay:-1.3s}
+.grid .card:nth-child(3n) .plate svg,.grid .card:nth-child(3n) .plate::after{animation-delay:-2.7s}
+.grid .card:nth-child(4n) .plate svg,.grid .card:nth-child(4n) .plate::after{animation-delay:-3.9s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes floatShadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.78);opacity:.45}}
+.flag{position:absolute;top:11px;left:11px;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+.flag.hot{background:var(--hot-soft);color:var(--hot)}
+.flag.good{background:var(--good-soft);color:var(--good)}
+.cbody{padding:15px;display:flex;flex-direction:column;gap:5px;flex:1}
+.brandline{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.card h3{font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.card .desc{color:var(--muted);font-size:12.5px;margin:0;flex:1}
+.stars{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)}
+.stars b{color:var(--ink);font-family:var(--mono);font-weight:700}
+.cfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px}
+.price{font-family:var(--mono);font-size:17px;font-weight:700}
+.price s{color:var(--muted);font-size:12.5px;font-weight:400;margin-right:6px}
+.add{padding:9px 14px;border-radius:9px;font-size:12.5px;font-weight:700;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line-2);transition:all .15s}
+.add:hover{background:var(--accent);color:var(--on-accent);box-shadow:none}
+
+/* ---------- try panels ---------- */
+.try{display:grid;grid-template-columns:.9fr 1.1fr;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));background:var(--surface);margin-bottom:28px;
+  box-shadow:0 6px 24px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.tstage{position:relative;min-height:236px;display:grid;place-items:center;background:linear-gradient(165deg,#1A1726,#0E0C16);overflow:hidden}
+.tctl{padding:24px;display:flex;flex-direction:column;gap:15px;justify-content:center}
+.demotag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk);
+  border:1px solid var(--line-2);padding:4px 10px;border-radius:999px;width:fit-content}
+.tctl h3{font-size:18px}
+.tctl .lead{color:var(--muted);font-size:13px;margin:-8px 0 0}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);display:flex;gap:8px}
+.field label span{margin-left:auto;color:var(--ink);font-weight:500}
+:where(.mvh-root) input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:3px;background:linear-gradient(90deg,var(--accent) var(--fill,50%),var(--line-2) var(--fill,50%))}
+:where(.mvh-root) input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+:where(.mvh-root) input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);cursor:pointer}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.sw{width:29px;height:29px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .15s,box-shadow .15s}
+.sw:hover{transform:scale(1.1)}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+.readout{display:flex;gap:18px;font-family:var(--mono);font-size:11.5px;color:var(--muted);padding-top:4px;border-top:1px solid var(--line)}
+.readout b{color:var(--ink);font-weight:700;display:block;font-size:14.5px}
+.bulb{width:118px;height:118px;border-radius:50%;transition:background .45s,box-shadow .45s,opacity .45s}
+.dial{width:162px;height:162px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(from 220deg,#7C3AED 0turn,#C084FC var(--sweep,.4turn),rgba(255,255,255,.09) var(--sweep,.4turn) .78turn,transparent .78turn)}
+.dial::before{content:"";position:absolute;inset:12px;border-radius:50%;background:#12101B}
+.dialv{position:relative;text-align:center;color:#F4F1FA}
+.dialv b{font-family:var(--mono);font-size:36px;font-weight:700;line-height:1;display:block}
+.dialv span{font-family:var(--mono);font-size:9.5px;opacity:.6;letter-spacing:.12em;text-transform:uppercase}
+.steppers{display:flex;gap:9px}
+.step{width:38px;height:38px;border-radius:10px;font-size:18px;font-weight:700;box-shadow:inset 0 0 0 1px var(--line-2);transition:all .15s}
+.step:hover{background:var(--accent);color:var(--on-accent);box-shadow:none}
+.saveline{font-size:13px;font-weight:700;color:var(--good)}
+.scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#A78BFA,transparent);animation:scan 3.6s linear infinite;opacity:.7}
+@keyframes scan{0%{top:5%}100%{top:95%}}
+.shield{width:78px;height:78px;color:rgba(244,241,250,.32);transition:color .4s,filter .4s}
+.armed .shield{color:#C4B5FD;filter:drop-shadow(0 0 16px rgba(167,139,250,.6))}
+.log{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:11px;max-height:96px;overflow-y:auto;color:var(--muted)}
+.log b{color:var(--accent);font-weight:500}
+.toggle{width:52px;height:29px;border-radius:15px;background:var(--line-2);position:relative;transition:background .22s;flex:none}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:transform .22s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle[aria-pressed="true"]{background:var(--accent)}
+.toggle[aria-pressed="true"]::after{transform:translateX(23px)}
+.togrow{display:flex;align-items:center;gap:13px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:104px;width:min(262px,80%);margin:0 auto}
+.bars i{flex:1;background:linear-gradient(180deg,#A78BFA,rgba(167,139,250,.12));border-radius:3px 3px 0 0;transition:height .4s ease}
+.watt{font-family:var(--mono);font-size:26px;font-weight:700;color:#F4F1FA;margin-top:12px;text-align:center}
+.watt small{font-size:11.5px;opacity:.6;font-weight:400}
+
+/* ---------- PDP ---------- */
+.pdp{display:grid;grid-template-columns:1.05fr .95fr;gap:46px;padding-top:28px}
+.pdplate{border-radius:16px;border:1px solid var(--line);background:linear-gradient(160deg,var(--sunk),var(--surface));display:grid;place-items:center;min-height:390px;position:relative;overflow:hidden}
+.pdplate::before{content:"";position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--accent-soft) 0%,transparent 66%)}
+.pdplate svg{width:128px;height:128px;color:var(--ink);opacity:.8;stroke-width:.9;position:relative;z-index:1;animation:float 6s ease-in-out infinite}
+.pdplate img{width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
+.pdplate.has-photo::after,.pdplate.has-photo::before{display:none}
+.pdplate::after{content:"";position:absolute;bottom:88px;width:118px;height:18px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(18,19,26,.24),transparent 72%);animation:floatShadow 6s ease-in-out infinite}
+:root[data-theme="dark"] .pdplate::after{background:radial-gradient(ellipse at center,rgba(0,0,0,.6),transparent 72%)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pdplate::after{background:radial-gradient(ellipse at center,rgba(0,0,0,.6),transparent 72%)}}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:14px}
+.crumb button{color:var(--accent);font-weight:600}
+.pdp h1{font-size:clamp(26px,3.3vw,36px);margin:8px 0 12px}
+.pdp .lead{color:var(--ink-2);font-size:15.5px;margin:0 0 20px}
+.pricerow{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.pricerow .p{font-family:var(--mono);font-size:30px;font-weight:700}
+.qtyrow{display:flex;gap:12px;margin:20px 0 14px}
+.qty{display:flex;align-items:center;border:1px solid var(--line-2);border-radius:10px;overflow:hidden}
+.qty button{width:40px;height:46px;font-size:17px;font-weight:700;transition:background .15s}
+.qty button:hover{background:var(--sunk)}
+.qty span{width:44px;text-align:center;font-family:var(--mono);font-weight:700}
+.spectable{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px}
+.spectable td{padding:11px 0;border-bottom:1px solid var(--line)}
+.spectable td:first-child{color:var(--muted);width:44%}
+.spectable td:last-child{font-family:var(--mono);font-weight:500;text-align:right}
+.ship{display:flex;flex-direction:column;gap:9px;margin-top:20px;padding:15px;border-radius:var(--r);background:var(--sunk);font-size:13.5px}
+.ship div{display:flex;gap:10px;align-items:flex-start}
+.ship svg{width:16px;height:16px;color:var(--good);flex:none;margin-top:3px}
+
+/* ---------- trust/faq/footer ---------- */
+.trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(224px,1fr));gap:1px;background:color-mix(in srgb,var(--accent) 40%,var(--line));border:1px solid color-mix(in srgb,var(--accent) 40%,var(--line));border-radius:var(--r);overflow:hidden;
+  box-shadow:0 4px 20px -10px color-mix(in srgb,var(--accent) 45%,transparent)}
+
+/* ---------- home quiz ---------- */
+.quizband{position:relative;overflow:hidden;padding:64px 0}
+.quizband::before{content:"";position:absolute;top:-150px;left:6%;width:440px;height:440px;border-radius:50%;
+  background:radial-gradient(circle,var(--accent-soft) 0%,transparent 70%);pointer-events:none}
+.quizband::after{content:"";position:absolute;bottom:-170px;right:5%;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,var(--accent-soft) 0%,transparent 70%);pointer-events:none;opacity:.8}
+.quizband>.wrap{position:relative;z-index:1}
+.quizcard{position:relative;overflow:hidden;border-radius:24px;padding:44px 48px;
+  background:#0B0714;box-shadow:0 24px 60px rgba(76,29,149,.28);
+  animation:quizGlow 4s ease-in-out infinite}
+@keyframes quizGlow{0%,100%{box-shadow:0 24px 60px rgba(76,29,149,.28)}50%{box-shadow:0 24px 70px rgba(168,85,247,.42)}}
+.quizcard::before{content:"";position:absolute;top:-160px;left:-60px;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.38) 0%,transparent 68%);pointer-events:none}
+.quizcard::after{content:"";position:absolute;bottom:-180px;right:-40px;width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(236,72,153,.30) 0%,transparent 68%);pointer-events:none}
+.quizcard .eyebrow{color:#D8B4FE}
+.quizcard h2{color:#fff}
+.quizcard>div>p{color:#C3BFD2!important}
+.quizgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;position:relative;z-index:1}
+.quizopt{display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 16px;border-radius:16px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);transition:all .2s;text-align:center}
+.quizopt:hover{border-color:#A855F7;background:rgba(168,85,247,.16);transform:translateY(-5px);
+  box-shadow:0 12px 28px rgba(168,85,247,.35)}
+.quizopt .qi{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,rgba(168,85,247,.35),rgba(236,72,153,.25));transition:transform .2s}
+.quizopt:hover .qi{transform:scale(1.12) rotate(-4deg)}
+.quizopt svg{width:22px;height:22px;color:#E9D5FF}
+.quizopt span{font-size:13.5px;font-weight:700;color:#F1EEF9}
+.qricon{width:68px;height:68px;border-radius:18px;
+  background:linear-gradient(135deg,rgba(168,85,247,.4),rgba(236,72,153,.3));color:#F3E8FF;
+  display:flex;align-items:center;justify-content:center;margin:0 auto;position:relative;z-index:1}
+.qricon svg{width:32px;height:32px}
+#quizStep2{position:relative;z-index:1}
+#quizStep2 h3{color:#fff}
+.quizcard .btn.ghost{color:#E9D5FF;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.quizcard .btn.ghost:hover{background:rgba(255,255,255,.08)}
+@media(max-width:600px){.quizcard{padding:30px 24px}}
+.trust div{background:var(--surface);padding:21px}
+.trust h4{font-size:14.5px;margin-bottom:5px}
+.trust p{color:var(--muted);font-size:12.5px;margin:0}
+.faq{border-top:1px solid var(--line);max-width:820px}
+.q{width:100%;text-align:left;padding:18px 0;display:flex;gap:16px;align-items:center;border-bottom:1px solid var(--line);font-weight:700;font-size:15.5px}
+.q .pl{margin-left:auto;color:var(--accent);font-size:21px;transition:transform .22s;flex:none}
+.q[aria-expanded="true"] .pl{transform:rotate(45deg)}
+.a{color:var(--ink-2);font-size:14.5px;padding:0 0 19px;border-bottom:1px solid var(--line);max-width:68ch}
+.closer{position:relative;overflow:hidden;background:#0B0714;padding:64px 0;text-align:center}
+.closer::before{content:"";position:absolute;top:-140px;left:12%;width:420px;height:420px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.30) 0%,transparent 68%);filter:blur(10px);pointer-events:none}
+.closer::after{content:"";position:absolute;bottom:-160px;right:10%;width:380px;height:380px;border-radius:50%;
+  background:radial-gradient(circle,rgba(236,72,153,.20) 0%,transparent 68%);filter:blur(10px);pointer-events:none}
+.closer .wrap{position:relative;z-index:1;max-width:640px;display:flex;flex-direction:column;align-items:center}
+.closer h2{color:#fff;font-size:clamp(22px,3vw,32px);margin:8px 0 12px}
+.closer p{color:#C9C3DC;font-size:16px;margin:0 0 26px;max-width:52ch}
+:where(.mvh-root) footer{border-top:1px solid var(--line);padding:46px 0;color:var(--muted);font-size:13px;background:var(--surface)}
+.fgrid{display:grid;grid-template-columns:1.4fr repeat(5,1fr);gap:26px;margin-bottom:34px}
+.fgrid h4{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin-bottom:12px}
+.fgrid button,.fgrid a{display:block;padding:4px 0;text-align:left;color:inherit;text-decoration:none;font-size:inherit}
+.fgrid button:hover,.fgrid a:hover{color:var(--accent)}
+
+/* ---------- cart ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,9,16,.42);backdrop-filter:blur(2px);z-index:60}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(410px,100%);background:var(--surface);border-left:1px solid var(--line);z-index:61;display:flex;flex-direction:column}
+.dhead{border-bottom:1px solid var(--line);padding:19px;display:flex;align-items:center;gap:12px}
+.dhead h3{font-size:17px;flex:1}
+.freebar{padding:13px 19px;border-bottom:1px solid var(--line);background:var(--sunk)}
+.freebar .t{font-size:12.5px;margin-bottom:8px;font-weight:600}
+.track{height:5px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.track i{display:block;height:100%;background:var(--good);transition:width .4s}
+.items{flex:1;overflow-y:auto;padding:17px 19px;display:flex;flex-direction:column;gap:15px}
+.item{display:flex;gap:12px;align-items:center}
+.item .ic{width:50px;height:50px;border-radius:10px;display:grid;place-items:center;background:var(--sunk);border:1px solid var(--line);flex:none}
+.item .ic svg{width:23px;height:23px;color:var(--ink);opacity:.8;stroke-width:1.2}
+.item .nm{flex:1;font-size:13px;font-weight:600;line-height:1.35}
+.miniqty{display:flex;align-items:center;gap:9px;margin-top:5px}
+.miniqty button{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:13px;line-height:1}
+.miniqty button:hover{background:var(--sunk)}
+.miniqty span{font-family:var(--mono);font-size:12px;min-width:14px;text-align:center}
+.item .pr{font-family:var(--mono);font-weight:700;font-size:13.5px}
+.totals{border-top:1px solid var(--line);padding:19px;display:flex;flex-direction:column;gap:11px}
+.tline{display:flex;justify-content:space-between;font-size:14px;color:var(--muted)}
+.tline span:last-child{font-family:var(--mono);color:var(--ink);font-weight:500}
+.tline.big{font-size:19px;font-weight:800;color:var(--ink);font-family:var(--display)}
+.tline.big span:last-child{font-family:var(--mono);font-weight:700}
+.empty{color:var(--muted);text-align:center;padding:46px 0;font-size:14px;grid-column:1/-1}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--bg);padding:13px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:70;opacity:0;transition:all .28s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+@media(max-width:1080px){.megagrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:940px){
+  .hero,.try,.pdp,.shop{grid-template-columns:1fr;gap:30px}
+  .side{position:static}
+  .fgrid{grid-template-columns:1fr 1fr}
+  .search{display:none}
+  .megainner{grid-template-columns:1fr}
+  .subcol{border-right:0;padding-right:0;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .devrow{grid-template-columns:repeat(3,1fr)}
+  .dev:nth-child(3){border-right:0}
+  .nav{display:none}
+  .hamburger{display:flex}
+}
+@media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.8 10.6c.5.4.8 1 .8 1.6v.8h6v-.8c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></symbol>
+<symbol id="i-strip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="8" width="19" height="6" rx="2"/><path d="M7 14v3M12 14v3M17 14v3"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 2.6 5 0 2.5 4.4-2.5 4.4-5 0L6.5 7z"/><path d="m14 12.6 5 0 2.5 4.4-2.5 4.4-5 0-2.5-4.4z"/><path d="m4 12.6 5 0 2.5 4.4L9 21.4l-5 0-2.5-4.4z"/></symbol>
+<symbol id="i-floor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8l1.5 7h-11z"/><path d="M12 10v10M8.5 20h7"/></symbol>
+<symbol id="i-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4h9l2 6h-13z"/><path d="M12 10v8M8 18h8"/></symbol>
+<symbol id="i-ceiling" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5v3.5"/><path d="M4 15 12 6l8 9z"/><path d="M8 18.5h8"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/></symbol>
+<symbol id="i-game" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 8h11a4.5 4.5 0 0 1 4.3 5.8l-.9 3A2.6 2.6 0 0 1 16.4 18l-1.9-2h-5L7.6 18a2.6 2.6 0 0 1-4.5-1.2l-.9-3A4.5 4.5 0 0 1 6.5 8z"/><path d="M7.5 11.5v2M6.5 12.5h2M16 12h.01M18 13.8h.01"/></symbol>
+<symbol id="i-proj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 4.6V2.4M12 21.6v-2.2M4.6 12H2.4M21.6 12h-2.2M6.7 6.7 5.1 5.1M18.9 18.9l-1.6-1.6M17.3 6.7l1.6-1.6M5.1 18.9l1.6-1.6"/></symbol>
+<symbol id="i-string" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5c4 5 8 5 10 0 2 5 6 5 10 0"/><path d="M5.5 7.5v2.5M12 8.8v2.5M18.5 7.5v2.5"/><circle cx="5.5" cy="11.6" r="1.4"/><circle cx="12" cy="12.9" r="1.4"/><circle cx="18.5" cy="11.6" r="1.4"/></symbol>
+<symbol id="i-flood" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="8" rx="1.6"/><path d="M12 12v4M8 20h8l-1.4-4h-5.2z"/></symbol>
+<symbol id="i-path" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 8h7l-1.5 4h-4z"/><path d="M12 12v8M8.5 20h7"/><path d="M4 5.5 6 8M20 5.5 18 8"/></symbol>
+<symbol id="i-solar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-2 7H6z"/><path d="M9.5 4 8 11M14.5 4 16 11M12 11v9M8.5 20h7"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6.5" width="13.5" height="11" rx="2.5"/><path d="M15.5 10.5 22 7.2v9.6l-6.5-3.3z"/><circle cx="8.75" cy="12" r="2.2"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><circle cx="12" cy="8.5" r="2.2"/><circle cx="12" cy="16" r="1.4"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/></symbol>
+<symbol id="i-sensor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 4.4V2.6M12 21.4v-1.8M4.4 12H2.6M21.4 12h-1.8M6.6 6.6 5.3 5.3M18.7 18.7l-1.3-1.3M17.4 6.6l1.3-1.3M5.3 18.7l1.3-1.3"/></symbol>
+<symbol id="i-siren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-3.5a6 6 0 0 1 12 0V16"/><rect x="3.5" y="16" width="17" height="4" rx="1.6"/><path d="M12 3.4V2M4.4 6 3.4 5M19.6 6l1-1"/></symbol>
+<symbol id="i-therm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.4V4.5a2 2 0 1 0-4 0v9.9a4.6 4.6 0 1 0 4 0z"/><path d="M12 8.5v7"/></symbol>
+<symbol id="i-vent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.2"/><path d="M12 9.8c0-3.6 5.6-3.6 5.6 0s-5.6 2.2-5.6 2.2 5.6 1.8 5.6 5.4-5.6 1.8-5.6-1.8"/><path d="M12 9.8c0-3.6-5.6-3.6-5.6 0s5.6 2.2 5.6 2.2-5.6 1.8-5.6 5.4 5.6 1.8 5.6-1.8"/></symbol>
+<symbol id="i-humid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2c3.4 4 5.4 6.6 5.4 9.2a5.4 5.4 0 0 1-10.8 0c0-2.6 2-5.2 5.4-9.2z"/><path d="M9.4 13.4a2.6 2.6 0 0 0 2.6 2.6"/></symbol>
+<symbol id="i-fan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.9"/><path d="M12 10.1c0-3.4-1.2-5.6-3.4-5.6S5.4 7 8.3 9.2"/><path d="M13.9 12c3.4 0 5.6-1.2 5.6-3.4S17 5.4 14.8 8.3"/><path d="M12 13.9c0 3.4 1.2 5.6 3.4 5.6s3.2-2.5.3-4.7"/><path d="M10.1 12c-3.4 0-5.6 1.2-5.6 3.4S7 18.6 9.2 15.7"/></symbol>
+<symbol id="i-blind" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 8.2h18M3 12.6h18M3 17h18"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.6v5.2M15 2.6v5.2M6 7.8h12v3.4a6 6 0 0 1-12 0z"/><path d="M12 17.2v4.2"/></symbol>
+<symbol id="i-switch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M9 8.5h6M9 15.5h6"/></symbol>
+<symbol id="i-hub" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.4"/><path d="M6.8 17.2a7.4 7.4 0 0 1 0-10.4M17.2 6.8a7.4 7.4 0 0 1 0 10.4M3.6 20.4a11.9 11.9 0 0 1 0-16.8M20.4 3.6a11.9 11.9 0 0 1 0 16.8"/></symbol>
+<symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="3"/><circle cx="12" cy="14.8" r="3.4"/><circle cx="12" cy="7" r="1.1"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6 4.2 6v6.1c0 4.9 3.3 8.5 7.8 9.3 4.5-.8 7.8-4.4 7.8-9.3V6z"/><path d="m9.1 12.1 2 2 3.8-3.9"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="i-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2.2l2.3 11.4a1.6 1.6 0 0 0 1.6 1.3h8.4a1.6 1.6 0 0 0 1.6-1.3L21 8H6"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17.5" cy="20" r="1.3"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.4 5.4l1.4 1.4M17.2 17.2l1.4 1.4M18.6 5.4l-1.4 1.4M6.8 17.2l-1.4 1.4"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.4 8.4 0 1 0 20 14.2z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6h10v10h-10z"/><path d="M12.5 9.5h4l3 3v3.5h-7z"/><circle cx="6" cy="18.5" r="1.6"/><circle cx="16.5" cy="18.5" r="1.6"/></symbol>
+<symbol id="i-money" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2A2.8 2.8 0 0 0 12 8c-1.6 0-2.6.8-2.6 1.9 0 2.8 5.6 1.3 5.6 4.2 0 1.2-1.1 2-2.9 2a3 3 0 0 1-2.6-1.3M12 6.4v11.2"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6" rx="1.6"/></symbol>
+<symbol id="i-vacuum" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.6"/><path d="M12 3.5v2.2M4.6 8l1.9 1.1M4.6 16l1.9-1.1"/></symbol>
+<symbol id="i-feeder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="10" rx="2"/><path d="M9 8.5h6"/><path d="M6 21c0-3 2.5-5.2 6-5.2s6 2.2 6 5.2"/><path d="M4.5 21h15"/></symbol>
+<symbol id="i-sprinkler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="9" width="11" height="8" rx="2"/><circle cx="10.5" cy="13" r="1.3"/><path d="M9 9V6.5a1.5 1.5 0 0 1 3 0V9"/><path d="M19 8c1.5 1.8 1.5 3.2 0 5M21.5 6.5c2.2 2.6 2.2 5.4 0 8"/></symbol>
+<symbol id="i-baby" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="8" rx="3"/><circle cx="12" cy="11" r="2"/><path d="M12 15v3M9 20h6"/><path d="M9 5.5c.8-1 1.8-1.5 3-1.5s2.2.5 3 1.5"/></symbol>
+<symbol id="i-litter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V12a8 8 0 0 1 16 0v8"/><circle cx="12" cy="14.5" r="3"/><path d="M4 20h16"/></symbol>
+<symbol id="i-safe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="12" cy="12" r="4"/><path d="M12 9v1M12 14v1M9.5 10.5l.7.7M13.8 12.8l.7.7"/><path d="M6.8 4V2.6M17.2 4V2.6"/></symbol>
+<symbol id="i-gps" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></symbol>
+</defs></svg>
+
+<div class="mvh-root">
+<div class="ann"><div class="anntrack">
+  <div class="anninner">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+  <div class="anninner" aria-hidden="true">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+  <div class="anninner" aria-hidden="true">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+  <div class="anninner" aria-hidden="true">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+  <div class="anninner" aria-hidden="true">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+  <div class="anninner" aria-hidden="true">
+    <span><svg fill="none" stroke="currentColor"><use href="#i-truck"/></svg> Free shipping over $200</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-money"/></svg> Need help? We reply fast</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-head"/></svg> Lifetime support</span>
+    <span><svg fill="none" stroke="currentColor"><use href="#i-shield"/></svg> Secure checkout</span>
+  </div>
+</div></div>
+
+<header>
+  <div class="bar">
+    <button class="hamburger" id="openDrawer" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <button class="brand" data-home>
+      <svg viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 40 26 8l14 20"/><path d="M26 40V22"/><path d="M32 40 46 20l14 20"/><path d="M40 40V29h12v11"/></svg>
+      Mavie Hauz
+    </button>
+    <nav class="nav" id="nav"></nav>
+    <div class="tools">
+      <label class="search"><svg><use href="#i-search"/></svg>
+        <input id="q" type="search" placeholder="Search products" aria-label="Search products"></label>
+      <button class="iconbtn" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon"><use href="#i-moon"/></svg></button>
+      <button class="iconbtn" id="openCart" aria-label="Open cart"><svg><use href="#i-cart"/></svg><span class="badge" id="cartN" hidden>0</span></button>
+    </div>
+  </div>
+  <div class="mega" id="mega" hidden></div>
+</header>
+
+<div class="mobilescrim" id="mobilescrim" hidden></div>
+<aside class="mobiledrawer" id="mobiledrawer" hidden aria-label="Menu">
+  <div class="mdhead">Menu<button class="mdclose" id="closeDrawer" aria-label="Close menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="mdlist" id="mdlist"></div>
+</aside>
+
+<main>
+<!-- HOME -->
+<div id="v-home">
+  <div class="hero"><div class="wrap">
+    <div>
+      <span class="pill"><svg fill="none" stroke="currentColor" stroke-width="2.5"><use href="#i-check"/></svg> Curated smart home devices, checked one by one</span>
+      <h1>The smart home,<br>without the wiring diagram.</h1>
+      <div class="row">
+        <button class="btn" data-nav="indoor">Shop indoor lights</button>
+        <button class="btn ghost" data-view="support">How setup works</button>
+      </div>
+    </div>
+    <div class="roomcard">
+      <div class="roomview">
+        <div class="wash" id="wash"></div><div class="cove" id="cove"></div>
+        <div class="roomhud"><div class="t" id="clock">--:--</div><div class="g" id="greet">Living room</div></div>
+        <div class="roomtemp"><div class="t" id="roomT">21°C</div><div class="l">Living room · 44% RH</div></div>
+      </div>
+      <div class="scenes" id="scenes">
+        <button class="scene" data-scene="morning" aria-pressed="false">Morning</button>
+        <button class="scene" data-scene="evening" aria-pressed="true">Evening</button>
+        <button class="scene" data-scene="movie" aria-pressed="false">Movie</button>
+        <button class="scene" data-scene="away" aria-pressed="false">Away</button>
+      </div>
+      <div class="devrow" id="devrow"></div>
+    </div>
+  </div></div>
+
+  <section class="quizband"><div class="wrap">
+    <div class="quizcard" id="quizCard">
+      <div id="quizStep1">
+        <span class="eyebrow">30-second finder</span>
+        <h2 style="font-size:26px;margin:8px 0 6px">What are you here to fix?</h2>
+        <p style="color:var(--ink-2);margin:0 0 22px">Pick what matters most right now — we'll point you to the right spot.</p>
+        <div class="quizgrid" id="quizOptions"></div>
+      </div>
+      <div id="quizStep2" hidden style="text-align:center;padding:12px 0">
+        <div class="qricon" id="qrIcon"></div>
+        <h3 id="quizResultTitle" style="font-size:22px;margin:18px 0 8px"></h3>
+        <p id="quizResultDesc" style="color:var(--ink-2);max-width:44ch;margin:0 auto 22px"></p>
+        <div class="row" style="justify-content:center">
+          <button class="btn" id="quizGoBtn">Take me there →</button>
+          <button class="btn ghost" id="quizRetry">Ask again</button>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+  <div class="wrap"><section style="padding-top:0">
+    <div class="sechead"><div><h2>Shop by system</h2><p>Five departments, organized the way you actually think about your home.</p></div></div>
+    <div class="cats" id="cats"></div>
+  </section></div>
+
+  <div class="wrap"><section style="padding-top:8px">
+    <div class="sechead"><div><h2>Shop by room</h2><p>Kits and singles picked for the space you're fixing.</p></div></div>
+    <div class="rooms" id="roomsGrid"></div>
+  </section></div>
+
+  <div class="wrap"><section style="padding-top:16px">
+    <div class="sechead"><div><h2>Best sellers</h2><p>What people buy first, and buy again.</p></div>
+      <button class="link" data-nav="indoor">Browse all products →</button></div>
+    <div class="grid" id="gridHome"></div>
+  </section></div>
+
+  <div class="wrap"><section style="padding-top:8px">
+    <div class="trust">
+      <div><h4>Free shipping over $200</h4><p>Below that, shipping cost and delivery time are shown at checkout.</p></div>
+      <div><h4>Works with your setup</h4><p>Most devices pair with Alexa or Google Home — exact compatibility is listed on each product page.</p></div>
+      <div><h4>Here if something's wrong</h4><p>Order arrive damaged or not as described? Contact us and we'll sort it out.</p></div>
+      <div><h4>Manufacturer warranty</h4><p>Warranty coverage is set by each product's manufacturer and noted on its product page.</p></div>
+    </div>
+  </section></div>
+</div>
+
+<!-- CATEGORY -->
+<div id="v-cat" hidden><div class="wrap"><section style="padding-top:26px">
+  <div class="cathero" id="catHero" hidden><h3 id="catHeroTitle"></h3></div>
+  <p class="eyebrow" id="catEyebrow"></p>
+  <div class="sechead"><div><h2 id="catTitle"></h2><p id="catBlurb"></p></div></div>
+  <div id="tryslot"></div>
+  <div class="shop" id="shopGrid">
+    <aside class="side"><h4>Categories</h4><div id="sideList"></div></aside>
+    <div>
+      <div class="toolbar" id="toolbar"></div>
+      <div class="grid" id="gridCat"></div>
+      <button class="btn ghost" id="loadMoreBtn" hidden style="margin:22px auto 0;display:flex"></button>
+    </div>
+  </div>
+</section></div></div>
+
+<!-- SEARCH -->
+<div id="v-search" hidden><div class="wrap"><section>
+  <p class="eyebrow">Search</p>
+  <div class="sechead"><div><h2 id="qTitle">Results</h2><p id="qCount" class="count"></p></div></div>
+  <div class="grid" id="gridSearch"></div>
+</section></div></div>
+
+<!-- PDP -->
+<div id="v-product" hidden><div class="wrap"><section style="padding-top:30px">
+  <div class="crumb"><button data-home>Home</button> / <button id="pdpCat"></button> / <span id="pdpName"></span></div>
+  <div class="pdp">
+    <div class="pdplate"><svg id="pdpIcon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use id="pdpUse"/></svg></div>
+    <div>
+      <h1 id="pdpTitle"></h1>
+      <p class="lead" id="pdpDesc"></p>
+      <div class="pricerow"><span class="p mono" id="pdpPrice"></span><span class="pill">In stock · ships today</span></div>
+      <div class="stars" id="pdpStars"></div>
+      <div class="qtyrow">
+        <div class="qty"><button id="qMinus" aria-label="Decrease">−</button><span id="qVal">1</span><button id="qPlus" aria-label="Increase">+</button></div>
+        <button class="btn" style="flex:1" id="pdpAdd">Add to cart</button>
+      </div>
+      <div class="ship">
+        <div><svg><use href="#i-check"/></svg><span>Free shipping over $200 · otherwise shown at checkout</span></div>
+        <div><svg><use href="#i-check"/></svg><span>Problem with your order? We're here to help</span></div>
+        <div><svg><use href="#i-check"/></svg><span>Manufacturer warranty — see product details</span></div>
+      </div>
+      <table class="spectable"><tbody id="pdpSpecs"></tbody></table>
+    </div>
+  </div>
+  <section style="padding-bottom:0"><div class="sechead"><div><h2 style="font-size:24px">You might also like</h2></div></div>
+    <div class="grid" id="gridRelated"></div></section>
+</section></div></div>
+
+<!-- SUPPORT -->
+<div id="v-support" hidden><div class="wrap"><section>
+  <p class="eyebrow">Support</p>
+  <div class="sechead"><div><h2>Answers before you buy</h2><p>Compatibility, shipping, setup and returns.</p></div></div>
+  <div class="faq" id="faq"></div>
+</section></div></div>
+
+<!-- ABOUT -->
+<div id="v-about" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">About Mavie Hauz</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:20px">Smart doesn't mean complicated.<br>It means comfortable.</h2>
+  <p style="font-size:17px;color:var(--ink);margin-bottom:18px">Most people think a smart home requires a massive renovation, messy wires, and thousands of dollars. We believe technology should be invisible — until the moment you need it.</p>
+  <p style="color:var(--ink-2);margin-bottom:18px">Mavie Hauz was built around one idea: your home should feel warmer, safer, and easier to live in, without a single wall being opened. We curate lighting, security, climate and connectivity devices that actually work together — so a Tuesday evening feels a little more like magic.</p>
+  <p style="color:var(--ink-2);margin-bottom:18px">We're not a warehouse of random gadgets. Every product on Mavie Hauz is chosen because it solves a real, everyday problem.</p>
+  <p style="color:var(--ink-2);margin-bottom:28px">We're a small team, and we read every message — reach out anytime through our <button data-view="contact" style="color:var(--accent);font-weight:700;display:inline">Contact</button> page.</p>
+</section></div></div>
+
+<!-- SHIPPING -->
+<div id="v-shipping" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">Policy</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:24px">Shipping Policy</h2>
+  <div style="background:var(--warn-soft,#FEF3C7);color:var(--warn,#B45309);padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:22px">⚠ Placeholder — exact shipping origins, delivery windows and fees are being finalized and will replace this notice.</div>
+  <h3 style="font-size:17px;margin:0 0 8px">Where we ship from</h3>
+  <p style="color:var(--ink-2);margin-bottom:18px">Shipping origin depends on the product and is noted on its product page.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Delivery times and cost</h3>
+  <p style="color:var(--ink-2);margin-bottom:18px">Estimated delivery time and shipping cost for your order are shown at checkout before you pay — nothing is charged until you see the final total.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Order processing</h3>
+  <p style="color:var(--ink-2);margin-bottom:18px">You'll receive a tracking number by email as soon as your order ships.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Questions about your order?</h3>
+  <p style="color:var(--ink-2)">Reach out through our <button data-view="contact" style="color:var(--accent);font-weight:700;display:inline">Contact</button> page with your order number.</p>
+</section></div></div>
+
+<!-- RETURNS -->
+<div id="v-returns" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">Policy</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:24px">Return Policy</h2>
+  <h3 style="font-size:17px;margin:0 0 8px">What's covered</h3>
+  <p style="color:var(--ink-2);margin-bottom:10px">We offer a full refund or free replacement if your order arrives in any of these conditions:</p>
+  <ul style="color:var(--ink-2);margin:0 0 18px;padding-left:20px;line-height:1.8">
+    <li>Damaged in transit</li>
+    <li>Defective or not working correctly</li>
+    <li>Wrong item, size or color sent</li>
+    <li>Item missing from your order</li>
+  </ul>
+  <p style="color:var(--ink-2);margin-bottom:18px">To claim, contact us through our <button data-view="contact" style="color:var(--accent);font-weight:700;display:inline">Contact</button> page within 30 days of delivery with your order number and clear photos or video of the issue. In most cases you won't need to send the item back.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">What's not covered</h3>
+  <p style="color:var(--ink-2);margin-bottom:18px">We're not able to offer refunds for orders that arrive correctly and simply weren't what you expected (change of mind). We know that's not what every store says, but we'd rather be upfront about it than promise something we can't deliver on.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Time limit</h3>
+  <p style="color:var(--ink-2)">Claims must be submitted within 30 days of delivery, and within 90 days of the original order date.</p>
+</section></div></div>
+
+<!-- CONTACT -->
+<div id="v-contact" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">Get in touch</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:16px">Questions? We're listening.</h2>
+  <p style="color:var(--ink-2);font-size:16px;margin-bottom:20px">Questions about an order, a product, or just want to say hi? We usually respond within 24 hours.</p>
+  <div style="display:inline-flex;align-items:center;gap:10px;background:var(--accent-soft);border-radius:12px;padding:16px 22px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex:none"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+    <a href="mailto:maviehauz@gmail.com" style="color:var(--accent-ink);font-weight:700;font-size:16px;font-family:var(--mono)">maviehauz@gmail.com</a>
+  </div>
+</section></div></div>
+
+<!-- TERMS -->
+<div id="v-terms" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">Legal</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:24px">Terms of Service</h2>
+  <h3 style="font-size:17px;margin:0 0 8px">Agreement to Terms</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">By using Mavie Hauz, you agree to these Terms of Service. If you don't agree, please don't use the site.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Products and pricing</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">We may change prices, descriptions and availability at any time. Colors may vary slightly from photos due to display settings.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Orders</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">We may refuse or cancel an order for reasons including stock availability, pricing errors, or suspected fraud.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Shipping</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Delivery estimates shown on the site are not guarantees. We're not responsible for delays caused by the carrier or customs.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Warranty</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Product warranties are provided by each item's manufacturer, not by Mavie Hauz, unless stated otherwise on the product page.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">International orders</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Mavie Hauz accepts orders from customers worldwide. By ordering, you confirm the product is legal to import into your country. Any customs duties, import taxes, or local fees charged on arrival are the buyer's responsibility and are not included in the item price or the shipping cost shown at checkout.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Limitation of liability</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Mavie Hauz is not liable for indirect or consequential damages from using our products or site, to the extent permitted by law.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Governing law</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">These terms are intended to work alongside, not override, any mandatory consumer protection rights you have under the law of your own country or state of residence.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Contact</h3>
+  <p style="color:var(--ink-2)">Questions about these terms? Reach out through our <button data-view="contact" style="color:var(--accent);font-weight:700;display:inline">Contact</button> page.</p>
+</section></div></div>
+
+<!-- PRIVACY -->
+<div id="v-privacy" hidden><div class="wrap"><section style="max-width:700px">
+  <p class="eyebrow">Legal</p>
+  <h2 style="font-size:clamp(26px,3.4vw,36px);margin-bottom:24px">Privacy Policy</h2>
+  <h3 style="font-size:17px;margin:0 0 8px">What we collect</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">When you shop with us, we collect what you provide directly: name, email, shipping address and payment details — processed securely by Wix Payments, we never see your full card number.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">How we use it</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">To process orders, send shipping updates, respond to your questions, and — only if you opt in — send occasional marketing emails you can unsubscribe from anytime.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Cookies</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">This site uses cookies to remember your cart and improve your experience. On your first visit, a cookie banner lets you choose which categories to allow — Necessary cookies are always on since the site can't work without them; Functional, Analytics and Marketing cookies only run if you consent. You can change your choice at any time from that banner.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Sharing your information</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">We don't sell or share your personal information for advertising purposes. We share it only with what makes the store work: Wix (hosting, payments) and our fulfillment partner (to ship your order).</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Data retention</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">We keep order information for as long as needed to fulfill your purchase and meet our legal and accounting obligations, then delete or anonymize it.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Your rights — EU, UK &amp; EEA</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Under the GDPR, you have the right to access, correct, delete, restrict, or receive a copy of your personal data, and to object to certain uses of it. You can also lodge a complaint with your local data protection authority.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Your rights — California</h3>
+  <p style="color:var(--ink-2);margin-bottom:16px">Under the CCPA, California residents can ask what personal information we've collected, request its correction or deletion, and opt out of its sale or sharing — which we don't do. Exercising any of these rights never results in different treatment or pricing.</p>
+  <h3 style="font-size:17px;margin:0 0 8px">Everywhere else</h3>
+  <p style="color:var(--ink-2)">Wherever you're located, you can request a copy, correction, or deletion of your data anytime through our <button data-view="contact" style="color:var(--accent);font-weight:700;display:inline">Contact</button> page.</p>
+</section></div></div>
+</main>
+
+<section class="closer">
+  <div class="wrap">
+    <p class="eyebrow" style="color:#D8B4FE">Mavie Hauz</p>
+    <h2>Discover smart home gadgets at Mavie Hauz</h2>
+    <p>WiFi lighting, security devices, pet feeders, air purifiers, and home automation accessories for every room.</p>
+    <button class="btn" data-home>Shop Now</button>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <div class="fgrid" id="footGrid"></div>
+  <div>© 2026 Mavie Hauz · All prices in USD</div>
+</div></footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Shopping cart">
+  <div class="dhead"><h3>Your cart</h3><button id="closeCart" aria-label="Close cart" style="font-size:24px;color:var(--muted);line-height:1">×</button></div>
+  <div class="freebar"><div class="t" id="freeText">Shipping is calculated at checkout</div></div>
+  <div class="items" id="items"><p class="empty">Your cart is empty.</p></div>
+  <div class="totals">
+    <div class="tline"><span>Subtotal</span><span id="sub">$0.00</span></div>
+    <div class="tline"><span>Shipping</span><span id="ship">—</span></div>
+    <div class="tline big"><span>Total</span><span id="tot">$0.00</span></div>
+    <button class="btn block" id="checkoutBtn">Proceed to checkout</button>
+  </div>
+</aside>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+/* Tudo dentro desta função — nenhum nome (const $, cur, view, fill...)
+   vira propriedade de window. Isso é obrigatório rodando como Custom
+   Code direto no site real (compartilha o mesmo JS da Wix e dos outros
+   apps instalados, ao contrário de um iframe isolado). */
+/* ══════════════════════════════════════════════════════════════
+   WIX — mude só estas 3 linhas quando a loja estiver pronta.
+
+   WIX_MODE  false = carrinho de demonstração (como está agora)
+             true  = botões levam ao checkout real do Wix Stores
+   STORE_URL endereço do seu site publicado, sem barra no final
+   WIX_SLUG  id do produto (coluna 1 do catálogo) → slug da URL no Wix.
+             Sem entrada aqui, usa o próprio id.
+   ══════════════════════════════════════════════════════════════ */
+const WIX_MODE=true;
+const STORE_URL='https://www.maviehauz.com';
+const WIX_SLUG={
+  '1640977':'6593af69-c28a-4fe5-bb37-1857a77d1766',
+  '1640967':'1818eed4-5d5c-40b4-923e-53dfe99b1256',
+  '1640923':'1cd29b02-7498-4f31-a9cd-af1b4af99245',
+  '1640931':'c2ab004a-877b-429a-8888-b33dcd3f9841',
+  '1640712':'805296b7-ec4b-4dc5-9abf-adac92c453ba',
+  '1908312':'8e8c26dd-cbc8-4921-a233-45ce06c5642c',
+  '2282772':'055cb8ef-9802-4d28-9989-91e1cdd8e8c4',
+  '3021842':'cb408fbc-bb93-426b-9fc1-0e79409b282d',
+  '1914625':'7f523126-5018-4d2a-a501-f84dd40b3937',
+  '2081600':'a5d938f8-f293-402a-bafd-c709ea7371e9',
+  '2289857':'9dfded85-f2cb-4484-ab39-a39caa59d9b3',
+  '1991492':'d204fc85-6b5f-4feb-85e8-3af8b99450ff',
+  '2022291':'3541096e-e115-4918-aa1e-385753e8ad58',
+  '2020795':'a68fa940-d66c-46da-86b1-7145ead4e671',
+  '2892783':'22985b61-2335-4823-97d1-f370f95537e1',
+  '3165754':'097df3c6-3fa8-478d-a587-886e884f6b26',
+  '2892679':'4def9861-f9c4-4ac8-bde9-c000919f6c7f',
+  '2892731':'fc2c9d45-3bbf-42cb-b0a3-ebc6a697ec0d',
+  '2772573':'5eb9644d-3f4e-4b04-bfad-e68d628bd280',
+  '2875338':'5d410e00-d4ab-4343-8b34-80c8c18db0f2',
+  '2934629':'e1d2a571-714e-4e73-a7c4-3da3bd655c48',
+  '2892689':'69a4e777-d7d4-49fe-b056-8d33bbd48382',
+  '2295086':'f301177d-41e1-40d7-9732-b2dff5fa66fd',
+  '2294537':'f7acd2ad-8e80-48f9-a5e9-0ea78181a619',
+  '2295971':'9600d590-aaf1-4e3c-b3ab-cba3f35458cc',
+  '2290338':'30a1b3f9-a862-438b-a242-7f9f47b3a99f',
+  '2283208':'7e89f79e-075b-492e-b88d-fd43aa537dc0',
+  '2279423':'7e31b788-199d-4eee-aaa5-b068fab14ffe',
+  '1640405':'a3804027-c848-4bf5-b7ce-8ac1bf5d1463',
+  '2404810':'953b8e6a-3249-4850-96bf-814de3ec53e4',
+  '2431796':'e0c3b268-864c-48ef-b6b6-4a207ac882ab',
+  '2417734':'de4b0dc1-381b-4b0d-9b3e-de9d6e197967',
+  '2404743':'1c068563-c349-4298-87b3-ee4935e2f235',
+  '2409874':'4209417a-bcbc-45da-b7da-6f6088358480',
+  '2418683':'854b4e24-c9d1-48f6-af60-9ff13f4eac8c',
+  '2015190':'d2f006ab-a8ff-40d0-915a-955f372e8900',
+  '2901056':'f5ac125b-558d-42b4-b792-7d57677382d4',
+  '2875251':'09e4ffb2-13f4-4e48-9fa1-a1b80322e9e0',
+  '2901104':'b5b308c7-4b4b-458b-804b-087926b2ca88',
+  '2954785':'906f16f6-1616-4112-936a-dbc511aa1ce7',
+  '1640675':'52da2bb2-cbff-42e1-8678-35d3b479d336',
+  '1640617':'c9745827-70ad-4402-b9d4-84a681557f7e',
+  '1641010':'3bcf71b2-1667-4490-a267-8e3484abf06d',
+  '1640893':'a6f3e019-c421-46e2-8b2b-8978dc1c3e51',
+  '3135469':'598d9cfd-ad8f-40ac-938e-687a8d7377ba',
+  '2464824':'db5c5e2d-6059-4120-8366-915cae294aa4',
+  '2895341':'ca9367f5-8cb2-4fb1-af73-3e3c56643301',
+  '2890687':'8218da55-eef4-49ad-9b0c-3f096bcdfdab',
+  '2767653':'be107036-4ba4-4f7a-964f-7f43eabdb51e',
+  '1971203':'e89fcc7f-d92c-474f-b7ed-19e3f19b8a83',
+  '1640566':'d089aba6-6651-4e9c-86d0-c0e858ec60fb',
+  '1640467':'07147d23-b24d-4470-9af5-93e113a28e74',
+  '3090631':'2ce6cd73-ecd3-4aee-849f-b81f5f240add',
+  '1961616':'01a9be28-2602-4a74-b5df-bd1c39efc741',
+  '2318351':'cf90e4f9-6323-403b-a159-9c7b2f879afd',
+  '3048179':'0b0a4aa1-d9c6-4313-adf0-466c11927ab4',
+  '2024881':'505cece4-b621-45cf-bb9f-b3b26549237d',
+  '2074739':'92eee5c4-249d-4219-ae89-46d23a705cad',
+  '3061540':'7e117bc7-2430-4b7b-9829-dd27a2ba2739',
+  '2659346':'6bcc01b3-a31b-4db8-be9e-9cc767b9bf28',
+  '3136134':'1f9cbc3c-e7bc-4cd5-a890-31f348eeaa0d',
+  '3147046':'3080bd44-4921-4839-9c26-376d1cb20cb8',
+  '3085373':'8b632a5a-f169-439f-8c27-560ca985fed7',
+  '2905285':'312b8347-815e-4bdf-a27c-3e901de3a4f8',
+  '2896625':'e8226ceb-c6b3-42de-a586-4ae7f649f7c3',
+  '2923741':'79158587-c74b-4c3e-b487-9ae55766ae5a',
+  '2778957':'09c2c007-ec5f-4cdc-8e61-ba88ca0cac1f',
+  '2620708':'083a5bbe-e185-4c1f-9554-2793c6d2fa80',
+  '2931141':'86c4299a-38a4-4241-ae70-00ab419655f5',
+  '2930238':'e56ee9c5-9814-4fae-8187-f4fa5efa08b8',
+  '3090714':'df397fb5-af59-4ca0-95bb-659973b11756',
+  '2419849':'0a3431a9-fdce-42cf-a3f4-3f92ef457607',
+  '2931057':'cff45c9f-1317-4f2b-bfea-7c653371636b',
+  '2866076':'d866eae9-c9d9-4cdd-9aef-aa931dd189d1',
+  '3065192':'62597942-aef7-4528-9a92-fb9a3ab217a0',
+  '2896903':'ee7f979a-c3c8-4a3a-992a-163de6b35dc5',
+  '3113617':'53cb6b9c-1d6b-40a8-95a7-824270fd5154',
+  '3063312':'0dfdba46-41e9-48f4-8d65-406e450ba072',
+  '2777259':'38252d01-2d0b-4bc8-b030-6b8cf80b06a9',
+  '1949846':'f401a01f-5483-4f35-b7ff-7484c1469008',
+  '2897066':'e4dc7719-e2c8-4092-b7ef-2853a2ba881b',
+  '2922500':'2096ba9f-d7d2-401d-a4ff-0424706d184e',
+  '1914164':'ad8df80f-9a5a-40eb-a896-cceaf1434f3b',
+  '2766575':'9b1a67a6-304a-419a-96d0-4e65721c4a13',
+  '1640677':'e6f49e01-e0c6-4dff-aceb-da10a1ae6429',
+  '2933600':'46a184b9-ebca-4060-b380-ea74e6e32ca6',
+  '1953736':'c0fce3f8-cb09-4f27-965a-1a357a6c6224',
+  '3206743':'00614518-b459-4a11-8adc-248d279a0273',
+  '2776183':'381502db-0b51-4aea-aa0f-983066da079d',
+  '3129590':'506c162e-edd4-48aa-991e-6bb4d9aa7b8e',
+  '1972075':'e831b505-d9f3-4d02-82a4-ead2b297f5e7',
+  '2090301':'40704a01-d6b0-4448-b190-d2f239f684c4',
+  '2001535':'18c64b01-9a17-4e37-b824-57b288679bbf',
+  '2585383':'689aa27e-4c72-4cc2-a408-17f2b292dc43',
+  '2616034':'86c2dd1b-3397-44c6-942c-2cc050c7c558',
+  '2904850':'cf17b885-491f-47ec-a270-2864c62345cc',
+  '2881134':'00df2a34-e5cb-4a67-94ea-7b5d5edb87d3',
+  '2764085':'320b07d4-016d-453d-a093-8c900ad3eaed',
+  '2904678':'63d7f359-3f5d-4977-837f-53c8fc50ec8e',
+  '2006454':'2cd5cf5d-cf75-4efc-adbf-6075a613038b',
+  '1904517':'77cad821-7c44-495a-9e84-4db201252ae4',
+  '2764305':'82b00f82-b4f8-4177-9e7c-ef569916020b',
+  '2924537':'7e55ee3b-9203-40a7-9f27-9ba6fe8d4db9',
+  '2310832':'5d73250c-8386-49fc-aa37-bdc7b9f3bf96',
+  '2646964':'31d61e71-6eb3-4de1-b0e2-cef4f8d1dca1',
+  '2881187':'f23923a2-1545-4a4f-8f84-2d0710721854',
+  '2771497':'33d987bd-0dfa-4614-9bdf-f1a5cdb1c209',
+  '2072113':'d650c368-5e4a-4ae9-8254-19db169296d4',
+  '2895495':'bc451f0a-1959-4e21-b34b-4979ac510e4a',
+  '2896994':'b3965285-c50f-4fc3-90e6-8e8fded306da',
+  '3136567':'091912cf-3e45-45c6-9465-8bb41c2950ae',
+  '1965227':'34de30b3-b057-4de6-b1a8-80305c73d4e3',
+  '2906113':'b0eabf09-4160-4336-a033-f52936766725',
+  '1913253':'1de500f2-2ff5-4e72-8362-b864418b10b0',
+  '2782170':'a88632dd-27c8-4ebd-9692-42447b7e387e',
+  '2772422':'00740e12-bd36-4fb1-a66d-fb35a9ac742d',
+};
+/* IMG — cole aqui a URL da foto real de cada produto (opcional).
+   Sem entrada, o cartão mostra o ícone de desenho como antes. */
+const IMG={
+  '1640977':'https://file.zendrop.com/products/cc/6b/028c0cf941f698dd0e515f6e34d2_import.webp',
+  '1640967':'https://file.zendrop.com/products/ca/cf/6255e7af48dca0300206be710207_import.webp',
+  '1640923':'https://file.zendrop.com/products/05/03/2dcfc62c40b6bd36ae3efec1aeaf_import.webp',
+  '1640931':'https://file.zendrop.com/products/de/19/9806cf304475b4178c932725aae8_import.webp',
+  '1640712':'https://file.zendrop.com/products/67/e4/726f9ef94c8b89e3927d667059e8_import.webp',
+  '1908312':'https://file.zendrop.com/products/53/23/9cc674b84b57807eb9eb35f88f26_import.webp',
+  '2282772':'https://file.zendrop.com/products/8e/11/200ec5b144069ac0c21991fbe928_import.webp',
+  '3021842':'https://file.zendrop.com/products/22/77/1cf02a014b8ca066842f08540aea_import.webp',
+  '1914625':'https://file.zendrop.com/products/bd/f8/1f5240634c9cb354f778c07bffb6_import.webp',
+  '2081600':'https://file.zendrop.com/products/cd/62/d7f5c41e4082bfcbcd005dfc451a_import.webp',
+  '2289857':'https://file.zendrop.com/products/8d/f5/228df1c14c6eb7da90892a6b8a1e_import.webp',
+  '1991492':'https://file.zendrop.com/products/13/d4/65843f414fe6a02aad881898c344_import.webp',
+  '2022291':'https://file.zendrop.com/products/ca/fa/5dc8a5884c949c95f950f6219028_import.webp',
+  '2020795':'https://file.zendrop.com/products/21/c9/61346b064cf0bee076c286519dee_import.webp',
+  '2892783':'https://file.zendrop.com/products/c3/64/76a157e744359d5ec9c03a9339f9_import.webp',
+  '3165754':'https://file.zendrop.com/products/5a/8e/6a3a0b944a5c8261abd7b9de29a4_import.webp',
+  '2892679':'https://file.zendrop.com/products/90/26/1a73ff0940f6bdffd979714adde9_import.webp',
+  '2892731':'https://file.zendrop.com/products/30/a1/578f1a8a4b869db253202e3caf19_import.webp',
+  '2772573':'https://file.zendrop.com/products/67/37/c188c9314a77b7c42860066e0a16_import.webp',
+  '2875338':'https://file.zendrop.com/products/ad/fa/b9120419495ea53ee81fb894f8fc_import.webp',
+  '2934629':'https://file.zendrop.com/products/5f/76/e06f12234e6c9b035acd6a04088d_import.webp',
+  '2892689':'https://file.zendrop.com/products/14/82/2979cb1347eebcc8b228c4cdf807_import.webp',
+  '2295086':'https://file.zendrop.com/products/e6/89/f1a0be494f75994ee6ef61fc4d00_import.webp',
+  '2294537':'https://file.zendrop.com/products/89/2c/5e5d62da442f8eb4d6555026006a_import.webp',
+  '2295971':'https://file.zendrop.com/products/ce/47/05eb7e4841858e58e51e0717af06_import.webp',
+  '2290338':'https://file.zendrop.com/products/36/ff/40ce68fe483c86eaa83e96d25db9_import.webp',
+  '2283208':'https://file.zendrop.com/products/1f/31/3bcf86da450b979ee2f52034b7d4_import.webp',
+  '2279423':'https://file.zendrop.com/products/7d/b9/fe00a45d47d0899389798dde66cf_import.webp',
+  '1640405':'https://file.zendrop.com/products/0a/46/86b5179b4934a6654b20d0c3b034_import.webp',
+  '2404810':'https://file.zendrop.com/products/17/e0/3b2b24e44c7f80b27aea45fd4974_import.webp',
+  '2431796':'https://file.zendrop.com/products/01/3e/0aba179f4ef9bc17c49cf9948ab8_import.webp',
+  '2417734':'https://file.zendrop.com/products/16/5d/449133dd48c4b0302ec8b7ad86e0_import.webp',
+  '2404743':'https://file.zendrop.com/products/5d/f9/6f31519f4f8dba9f114eb4e6ecff_import.webp',
+  '2409874':'https://file.zendrop.com/products/64/00/20355c3944bab6a7d6e066d9beac_import.webp',
+  '2418683':'https://file.zendrop.com/products/2b/d4/c486501648b5b0e60ee5ebbb49b0_import.webp',
+  '2015190':'https://file.zendrop.com/products/40/e7/7626a55344839415ca8c8e70235f_import.webp',
+  '2901056':'https://file.zendrop.com/products/6c/00/5d8e5dcc4ac48f417cc95a733303_import.webp',
+  '2875251':'https://file.zendrop.com/products/b9/90/f8c38bd04691b61d7b945d120e12_import.webp',
+  '2901104':'https://file.zendrop.com/products/f4/88/eeaa20b148d1aa83e6fbe97a884b_import.webp',
+  '2954785':'https://file.zendrop.com/products/d4/dd/bc5ba9eb4216a17d671ee430f3e9_import.webp',
+  '1640675':'https://file.zendrop.com/products/21/cd/80c2e33e44709d3312980be75ddd_import.webp',
+  '1640617':'https://file.zendrop.com/products/b2/81/f06172ca4702851e80a67fe5fa51_import.webp',
+  '1641010':'https://file.zendrop.com/products/d6/1a/546f403644a88b79a5f3f91c0dc4_import.webp',
+  '1640893':'https://file.zendrop.com/products/50/a3/a1ba81e44d76be052f0a85d9d2b1_import.webp',
+  '3135469':'https://file.zendrop.com/products/b0/29/0a54e9a749e582ce1ca578d5e12b_import.webp',
+  '2464824':'https://file.zendrop.com/products/4e/92/2bf17cec40a1a0c55e214e0be809_import.webp',
+  '2895341':'https://file.zendrop.com/products/e9/2a/a231f3d843cba466f664098533b0_import.webp',
+  '2890687':'https://file.zendrop.com/products/c3/42/3974203a4729a8ca062bb487f8f8_import.webp',
+  '2767653':'https://file.zendrop.com/products/ba/90/fd658704468abb69deec00b3a76e_import.webp',
+  '1971203':'https://file.zendrop.com/products/c0/64/485b66a34cfcbc4dae93b37ed177_import.webp',
+  '1640566':'https://file.zendrop.com/products/b5/dd/7598a0864d49828bb8e8d906636d_import.webp',
+  '1640467':'https://file.zendrop.com/products/a9/a6/6e5eca6a41ee842bd3354e0bc308_import.webp',
+  '3090631':'https://file.zendrop.com/products/8b/97/cabd456748449941266a8da05f69_import.webp',
+  '1961616':'https://file.zendrop.com/products/ca/61/9f2c4a524618841d31aae3f91ed7_import.webp',
+  '2318351':'https://file.zendrop.com/products/57/46/8e69057147c0a9936f4365d7e6d7_import.webp',
+  '3048179':'https://file.zendrop.com/products/df/a9/2e6da55646f1a15b8f729d6fdf1b_import.webp',
+  '2024881':'https://file.zendrop.com/products/9a/ed/74a225694a61ba1e6c8e5478783b_import.webp',
+  '2074739':'https://file.zendrop.com/products/dd/ea/03efe56c4ae99b5a85fd323363d8_import.webp',
+  '3061540':'https://file.zendrop.com/products/1f/55/e6be09324664bba1d4183f307ad2_import.webp',
+  '2659346':'https://file.zendrop.com/products/5f/15/92bd35c04b4989ce8946eda4b579_import.webp',
+  '3136134':'https://file.zendrop.com/products/ef/a6/86b414494aff95c772d4e41399bb_import.webp',
+  '3147046':'https://file.zendrop.com/products/4f/3c/a74331f8489eb040c1db19cccce8_import.webp',
+  '3085373':'https://file.zendrop.com/products/ff/bf/37f7c3c04d32a935b757586c60a0_import.webp',
+  '2905285':'https://file.zendrop.com/products/bf/22/0de0e1f6460492f2f0480fc08c41_import.webp',
+  '2896625':'https://file.zendrop.com/products/62/7e/725f6d774562aabab6d8e97663f0_import.webp',
+  '2923741':'https://file.zendrop.com/products/ed/b8/e99049a44bae8fd2973fa8551967_import.webp',
+  '2778957':'https://file.zendrop.com/products/b5/bb/5ece22b04e389b861d81e6fc4b37_import.webp',
+  '2620708':'https://file.zendrop.com/products/0e/20/2f0fc94a4a89a8c2f8dd740c6ccf_import.webp',
+  '2931141':'https://file.zendrop.com/products/85/d5/479eb7504efe883f46ab1f2d28c1_import.webp',
+  '2930238':'https://file.zendrop.com/products/ba/81/dec0d45748fcb06b8b026bbe7409_import.webp',
+  '3090714':'https://file.zendrop.com/products/a1/15/1c27731648e5acf54b5c2a3a6999_import.webp',
+  '2419849':'https://file.zendrop.com/products/7c/31/459e0ee04e04a5b319fbabe962e5_import.webp',
+  '2931057':'https://file.zendrop.com/products/52/25/3d0fb9084cd0b559d88ee2586f60_import.webp',
+  '2866076':'https://file.zendrop.com/products/f3/15/6345494b4f158bca75097dbd393d_import.webp',
+  '3065192':'https://file.zendrop.com/products/c4/39/cd260089454c8623971008689b5b_import.webp',
+  '2896903':'https://file.zendrop.com/products/0f/da/0cacf906413ca0030be2ee87c646_import.webp',
+  '3113617':'https://file.zendrop.com/products/35/38/a969aa81482b91102d8f58dfc48e_import.webp',
+  '3063312':'https://file.zendrop.com/products/da/3c/790cd2c54e29bc7374c0c1201560_import.webp',
+  '2777259':'https://file.zendrop.com/products/d0/a7/a594f0624958a573d9df222aed68_import.webp',
+  '1949846':'https://file.zendrop.com/products/4d/75/a688b6c64da49f0967fa8286dab0_import.webp',
+  '2897066':'https://file.zendrop.com/products/6a/5f/7d27329a47e094d9a7a320567bfd_import.webp',
+  '2922500':'https://file.zendrop.com/products/37/c2/8c64d8df48a7a6d2f6905c52b8a2_import.webp',
+  '1914164':'https://file.zendrop.com/products/f4/73/bd85eb144d2588b5db4577d7fa7a_import.webp',
+  '2766575':'https://file.zendrop.com/products/e1/1f/b2b48afb4cd0bb0d9853bd9aef98_import.webp',
+  '1640677':'https://file.zendrop.com/products/61/53/64010f5c4ef2b7b13cd5cb8c422f_import.webp',
+  '2933600':'https://file.zendrop.com/products/19/62/2e48e2064a8f95db13a929d25a1a_import.webp',
+  '1953736':'https://file.zendrop.com/products/7b/da/14e1685643e6a1c02da1bae8e6ab_import.webp',
+  '3206743':'https://file.zendrop.com/products/7a/82/4f185cff4f6c8d648dccb3e59c77_import.webp',
+  '2776183':'https://file.zendrop.com/products/06/bb/07d99d7241d593ebe3c303415253_import.webp',
+  '3129590':'https://file.zendrop.com/products/5d/6d/762b0e3c440884e81b7b6a35fc70_import.webp',
+  '1972075':'https://file.zendrop.com/products/e1/fd/1ca7e9ec409fa866358f40d2e410_import.webp',
+  '2090301':'https://file.zendrop.com/products/06/b7/025959bc420ea82922f87940f26a_import.webp',
+  '2001535':'https://file.zendrop.com/products/18/1c/01bbed564de6872342d329a38e78_import.webp',
+  '2585383':'https://file.zendrop.com/products/aa/a3/0b31e196465f8afc97474becd3ec_import.webp',
+  '2616034':'https://file.zendrop.com/products/d4/85/57d4bf27457d801ca10b2dba1d04_import.webp',
+  '2904850':'https://file.zendrop.com/products/0f/85/30ade4f14a15837814d3845eb9bd_import.webp',
+  '2881134':'https://file.zendrop.com/products/e2/17/71521ad848528c5b06c9b9404793_import.webp',
+  '2764085':'https://file.zendrop.com/products/f7/4a/a7b10c444c7080a4158b369d0fef_import.webp',
+  '2904678':'https://file.zendrop.com/products/b3/ca/20e057224c27a6d8804937d6d691_import.webp',
+  '2006454':'https://file.zendrop.com/products/78/9e/8f3fb8a94555a3266ecdd7f0c695_import.webp',
+  '1904517':'https://file.zendrop.com/products/46/8b/89779bce49bcaf47628d4243f23e_import.webp',
+  '2764305':'https://file.zendrop.com/products/74/45/6b4cf68f483ca44abbfe0fa99cd3_import.webp',
+  '2924537':'https://file.zendrop.com/products/86/c0/166419f344c6b483e0516ec519e3_import.webp',
+  '2310832':'https://file.zendrop.com/products/35/95/2cea14d14d91b14d59d963f6d3d6_import.webp',
+  '2646964':'https://file.zendrop.com/products/06/bd/c629cd8642d5aebb08db208fa436_import.webp',
+  '2881187':'https://file.zendrop.com/products/37/28/b52820bc443d8be8777cda304f45_import.webp',
+  '2771497':'https://file.zendrop.com/products/21/87/40b7a7614c9295cd49e8e33a65ad_import.webp',
+  '2072113':'https://file.zendrop.com/products/aa/90/2fcdeae0431f83b3b4f9765e2c7e_import.webp',
+  '2895495':'https://file.zendrop.com/products/f4/9c/fadfe5474adb86ee965a826122a8_import.webp',
+  '2896994':'https://file.zendrop.com/products/25/0b/f8f156c74acaaaed11c5fda2bea6_import.webp',
+  '3136567':'https://file.zendrop.com/products/a7/1c/9c6a5c3f447ba3da25969a0ed2be_import.webp',
+  '1965227':'https://file.zendrop.com/products/d3/97/6a6f52a84a80b5386eb2ca7a8212_import.webp',
+  '2906113':'https://file.zendrop.com/products/d5/3c/f94414d949b1a39bdc6384142787_import.webp',
+  '1913253':'https://file.zendrop.com/products/00/c6/fc0677b04c86abe17222cb6b3ec8_import.webp',
+  '2782170':'https://file.zendrop.com/products/bd/36/517310f94ce29cae60a1efd7850e_import.webp',
+  '2772422':'https://file.zendrop.com/products/dd/f9/55f9f09243e392ec22c6d9f9bb22_import.webp',
+};
+
+/* ══════════════════════════════════════════════════════════════
+   PÁGINAS SEPARADAS — cada categoria vira uma página real do Wix.
+   Copie este arquivo 8 vezes; em cada cópia, mude só PAGE_VIEW.
+
+   PAGE_VIEW = 'home'      → página inicial (esta configuração)
+             = 'indoor'    → página Indoor Lights
+             = 'outdoor'   → página Outdoor Lights
+             = 'security'  → página Security
+             = 'climate'   → página Climate
+             = 'connect'   → página Connectivity
+             = 'deals'     → página Deals
+             = 'support'   → página Support
+
+   PAGE_URL: ajuste se o Wix gerar um endereço de página diferente
+   do que está aqui (confira na barra de endereço ao publicar).
+   ══════════════════════════════════════════════════════════════ */
+const MULTI_PAGE=false;
+const PAGE_VIEW='home';
+const PAGE_URL={
+  home:'/store', indoor:'/indoor-lights', outdoor:'/outdoor-lights', security:'/security',
+  climate:'/climate', connect:'/connectivity', homecare:'/home-care', deals:'/deals', support:'/support'
+};
+/* Navega entre as páginas do site.
+   Dois detalhes obrigatórios, senão dá "Forbidden":
+   1) endereço ABSOLUTO (STORE_URL + caminho) — o código roda dentro de um iframe
+      do Wix, então "/store" sozinho apontaria pro domínio errado;
+   2) target="_top" — troca a aba inteira, e não só o quadradinho do embed. */
+function goPage(path){
+  const a=document.createElement('a');
+  a.href=STORE_URL+path;
+  a.target='_top';
+  document.body.appendChild(a);a.click();a.remove();
+}
+
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const usd=n=>'$'+n.toFixed(2);
+/* abre a loja real numa aba nova — mais confiável que navegar a aba atual */
+const goWix=path=>{
+  const a=document.createElement('a');
+  a.href=STORE_URL+path;a.target='_blank';a.rel='noopener';
+  document.body.appendChild(a);a.click();a.remove();
+};
+const goProduct=id=>goWix('/product-page/'+(WIX_SLUG[id]||id));
+
+/* ============ TAXONOMY ============ */
+const NAV=[
+ {k:'indoor',n:'Indoor Lights',ic:'i-bulb',blurb:'Bulbs, strips, lamps and panels that tune to the hour.',subs:[
+   {k:'bulbs',n:'Smart Bulbs',ic:'i-bulb',lbl:['Brightness','Color temp','Fitting']},
+   {k:'strips',n:'LED Strip Lights',ic:'i-strip',lbl:['Length','Zones','Cut points']},
+   {k:'floor',n:'Floor Lamps',ic:'i-floor',lbl:['Height','Output','Base']},
+   {k:'table',n:'Table Lamps',ic:'i-table',lbl:['Height','Output','Power']},
+   {k:'ceiling',n:'Ceiling Lights',ic:'i-ceiling',lbl:['Diameter','Output','Mount']},
+   {k:'tv',n:'TV Backlights',ic:'i-tv',lbl:['Screen size','Sync','Zones']},
+   {k:'gaming',n:'Gaming Lights',ic:'i-game',lbl:['Sync source','Zones','Latency']},
+   {k:'panels',n:'Wall Panels',ic:'i-panel',lbl:['Panels','Modes','Expandable']},
+   {k:'proj',n:'Galaxy Projectors',ic:'i-proj',lbl:['Coverage','Modes','Timer']},
+   {k:'vidproj',n:'Video Projectors',ic:'i-proj',lbl:['Resolution','Brightness','Connectivity']}]},
+ {k:'outdoor',n:'Outdoor Lights',ic:'i-string',blurb:'Weatherproof light for the yard, path and facade.',subs:[
+   {k:'string',n:'String Lights',ic:'i-string',lbl:['Length','Bulbs','Rating']},
+   {k:'permanent',n:'Permanent Lights',ic:'i-strip',lbl:['Length','Points','Rating']},
+   {k:'flood',n:'Flood Lights',ic:'i-flood',lbl:['Output','Beam','Rating']},
+   {k:'path',n:'Pathway Lights',ic:'i-path',lbl:['Included','Output','Rating']},
+   {k:'solar',n:'Solar Lights',ic:'i-solar',lbl:['Runtime','Charge','Rating']},
+   {k:'irrigation',n:'Irrigation Controllers',ic:'i-sprinkler',lbl:['Zones','Control','Rating']}]},
+ {k:'security',n:'Security',ic:'i-shield',blurb:'Cameras, locks and sensors that flag only what matters.',subs:[
+   {k:'cameras',n:'Cameras',ic:'i-cam',lbl:['Resolution','Night vision','Storage']},
+   {k:'doorbells',n:'Video Doorbells',ic:'i-bell',lbl:['Resolution','Field of view','Power']},
+   {k:'locks',n:'Smart Locks',ic:'i-lock',lbl:['Unlock methods','Battery','Finish']},
+   {k:'sensors',n:'Sensors',ic:'i-sensor',lbl:['Included','Range','Battery']},
+   {k:'alarms',n:'Alarms & Sirens',ic:'i-siren',lbl:['Volume','Backup','Range']},
+   {k:'garage',n:'Garage Door',ic:'i-lock',lbl:['Compatibility','App','Install']},
+   {k:'baby',n:'Baby Monitors',ic:'i-baby',lbl:['Resolution','Night vision','Range']},
+   {k:'safes',n:'Smart Safes',ic:'i-safe',lbl:['Unlock methods','Capacity','Finish']}]},
+ {k:'climate',n:'Climate',ic:'i-therm',blurb:'Thermostats, air and blinds that cut the bill.',subs:[
+   {k:'thermostats',n:'Thermostats',ic:'i-therm',lbl:['Remote sensors','Compatibility','Payback']},
+   {k:'purifiers',n:'Air Purifiers',ic:'i-vent',lbl:['Room size','Filter','Noise']},
+   {k:'humid',n:'Humidifiers',ic:'i-humid',lbl:['Tank','Runtime','Room size']},
+   {k:'fans',n:'Fans',ic:'i-fan',lbl:['Speeds','Noise','Oscillation']},
+   {k:'blinds',n:'Blind Motors',ic:'i-blind',lbl:['Max load','Charge','Noise']}]},
+ {k:'connect',n:'Connectivity',ic:'i-plug',blurb:'Plugs, switches and hubs that tie the house together.',subs:[
+   {k:'plugs',n:'Smart Plugs',ic:'i-plug',lbl:['Max load','Metering','Size']},
+   {k:'switches',n:'Wall Switches',ic:'i-switch',lbl:['Gangs','Neutral','Dimming']},
+   {k:'hubs',n:'Hubs & Bridges',ic:'i-hub',lbl:['Devices','Radios','Local control']},
+   {k:'speakers',n:'Speakers',ic:'i-speaker',lbl:['Drivers','Multiroom','Assistants']}]},
+ {k:'homecare',n:'Home Care',ic:'i-vacuum',blurb:'Devices that keep the house running without you lifting a finger.',subs:[
+   {k:'vacuums',n:'Robot Vacuums',ic:'i-vacuum',lbl:['Suction','Battery life','Control']},
+   {k:'feeders',n:'Pet Feeders',ic:'i-feeder',lbl:['Capacity','Camera','Meals/day']},
+   {k:'litter',n:'Smart Litter Boxes',ic:'i-litter',lbl:['Bin size','Weeks','Cats']},
+   {k:'trackers',n:'Pet Trackers',ic:'i-gps',lbl:['Connection','Battery life','Waterproof']}]}
+];
+const ROOMS=[
+ {k:'living',n:'Living Room'},{k:'bedroom',n:'Bedroom'},{k:'kitchen',n:'Kitchen'},
+ {k:'gaming',n:'Gaming Setup'},{k:'outdoor',n:'Garden & Patio'},{k:'office',n:'Home Office'}];
+
+/* ============ CATALOG ============
+   Connect Zendrop here. Columns:
+   id, nav, sub, icon, brand, name, price, was(0=none), flag, rating, reviews, blurb, [3 specs], [rooms] */
+const RAW=[
+
+/* ===== Produtos reais (Zendrop), adicionados após o catálogo de exemplo acima.
+   Sem nota/avaliação — a Zendrop não fornece esse dado, não inventamos. ===== */
+['1640977','security','doorbells','i-bell','','Wireless WiFi Smart Video Doorbell with Chime',64.99,0,'',null,null,"Chime included — hear the doorbell ring from anywhere in the house.",['HD','160°','Battery'],['outdoor']],
+['1640967','security','doorbells','i-bell','','Wireless Smart WiFi Doorbell Camera with Chime',66.99,0,'',null,null,'A second camera angle option in the same wireless doorbell family.',['HD','160°','Battery'],['outdoor']],
+['1640923','security','doorbells','i-bell','','Smart WiFi Video Doorbell with Chime & Intercom',63.99,0,'',null,null,"Two-way intercom built in — talk to whoever's at the door from your phone.",['HD','160°','Battery'],['outdoor']],
+['1640931','security','doorbells','i-bell','','Smart WiFi Video Doorbell with Phone Intercom',107.99,0,'',null,null,'Phone intercom and the widest field of view in the doorbell lineup.',['HD','170°','Battery'],['outdoor']],
+['1640712','security','doorbells','i-bell','','WiFi Video Doorbell 1080P HD Camera with Chime',99.99,0,'',null,null,'1080P HD with chime — clear footage of every visitor and parcel.',['1080P','160°','Battery'],['outdoor']],
+['1908312','security','doorbells','i-bell','','Front Door Video Doorbell',179.99,0,'',null,null,'Rugged build for a front door that takes real weather.',['HD','160°','Battery or wired'],['outdoor']],
+['2282772','security','cameras','i-cam','ZOSI','ZOSI 1080P Bullet Security Camera',73.99,0,'',null,null,'Bullet-style CCTV camera built for continuous outdoor surveillance.',['1080P','Night vision','microSD'],['outdoor']],
+['3021842','security','cameras','i-cam','','1080P WiFi Indoor Security Camera',63.99,0,'',null,null,'Indoor camera that covers a single room end to end, day or night.',['1080P','Night vision','microSD'],['living']],
+['1914625','security','cameras','i-cam','','Wireless Security Camera 1080P',74.99,0,'',null,null,'Motion detection with an on-device deterrent alarm, not just a notification.',['1080P','Night vision','microSD'],['living','outdoor']],
+['2081600','security','cameras','i-cam','Vivitar','Vivitar Indoor WiFi Security Camera',89.99,0,'',null,null,'Wide-angle indoor coverage with two-way talk built in.',['2K','Night vision','microSD + app'],['living']],
+['2289857','security','cameras','i-cam','REOLINK','REOLINK E1 Pan/Tilt Indoor Camera',59.99,0,'HOT',null,null,"REOLINK's plug-in indoor camera — pan and tilt to follow the room.",['3MP','Night vision','microSD + app'],['living']],
+['1991492','security','locks','i-lock','','Fingerprint Smart Door Lock, Round Handle',133.99,0,'',null,null,'Round handle design with fingerprint, code or key — hold it open for guests.',['3 methods','~9 months','Satin'],['outdoor']],
+['2022291','security','locks','i-lock','','Electronic Combination Lock',94.99,0,'',null,null,'Combination and fingerprint entry with app control from anywhere.',['Fingerprint + app','~6 months','Black'],['outdoor']],
+['2020795','security','locks','i-lock','','Smart Door Lock with Face Recognition',173.99,0,'',null,null,'Face recognition on top of fingerprint and password — the most methods in the lineup.',['4 methods','~9 months','Black'],['outdoor']],
+['2892783','security','locks','i-lock','','Smart Door Lock, Biometric & Keyless Entry',126.99,0,'',null,null,'Biometric and keyless entry in one deadbolt.',['Biometric + code','~9 months','Black'],['outdoor']],
+['3165754','security','garage','i-lock','','WiFi Smart Garage Door Controller',44.99,0,'',null,null,'Turns any garage door into a WiFi one — TUYA/SmartLife app plus Alexa and Google Assistant.',['Most standard openers','TUYA / SmartLife','DIY, no wiring change'],['outdoor']],
+['2892679','security','sensors','i-sensor','Aubess','Aubess WiFi Water Leak Detector',23.99,0,'',null,null,'Sits by the water heater or under the sink — alerts the moment it gets wet.',['1 sensor','WiFi','Replaceable'],['kitchen']],
+['2892731','security','sensors','i-sensor','','Zigbee Water Leakage Detector',26.99,0,'',null,null,'Same idea, over Zigbee — pairs with a hub instead of relying on WiFi alone.',['1 sensor','Zigbee','Replaceable'],['kitchen']],
+['2772573','security','sensors','i-sensor','Aqara','Aqara Water Leak Sensor',17.99,0,'',null,null,"Aqara's flood sensor — rated for basements, kitchens and bathrooms.",['1 sensor','Zigbee','CR2032'],['kitchen']],
+['2875338','security','alarms','i-siren','','WiFi Smoke Detector & Alarm',25.99,0,'',null,null,'WiFi smoke alarm that pushes a phone alert the moment it triggers.',['85 dB','Battery','Home WiFi'],['living','bedroom']],
+['2934629','security','alarms','i-siren','','WiFi Zigbee Natural Gas Alarm',30.99,0,'',null,null,'Detects a gas leak, not smoke — a different risk than the rest of this shelf.',['85 dB','Battery','WiFi + Zigbee hub'],['kitchen']],
+['2892689','security','alarms','i-siren','','Carbon Monoxide & Smoke Alarm',44.99,0,'',null,null,'Smoke and carbon monoxide in the same unit.',['85 dB','Battery','Home WiFi'],['living','bedroom']],
+['2295086','connect','plugs','i-plug','Jinvocloud','Jinvocloud WiFi Smart Power Strip',69.99,0,'',null,null,'Four outlets and four USB ports on one strip, each switched independently.',['16A total','Per outlet','4 AC + 4 USB'],['living','office']],
+['2294537','connect','plugs','i-plug','Geeni','Geeni Smart Wall Plug',89.99,0,'',null,null,'Surge protection built into a four-outlet smart strip.',['16A total','Per outlet','4 AC + 2 USB'],['living','office']],
+['2295971','connect','plugs','i-plug','meross','meross Smart Power Strip, HomeKit',57.99,0,'',null,null,'The only plug here that speaks Apple HomeKit, not just Alexa and Google.',['15A','Per outlet','4 AC + 4 USB'],['living','office']],
+['2290338','connect','plugs','i-plug','Kasa','Kasa Smart Power Strip KP303',39.99,0,'',null,null,"TP-Link's well-known smart strip — three outlets, independently switched.",['15A','Per outlet','3 AC + 2 USB'],['living','office']],
+['2283208','connect','plugs','i-plug','Amazon Basics','Amazon Basics Smart Plug Power Strip',39.99,0,'',null,null,"Amazon's own smart strip — works with Alexa, nothing fancier.",['13A','Per outlet','3 AC + 2 USB'],['living','office']],
+['2279423','connect','plugs','i-plug','Yozisital','Yozisital Smart Power Strip',99.99,0,'',null,null,'Six independently-switched outlets — enough for an entire entertainment wall.',['16A total','Per outlet','6 AC + 4 USB'],['living','office']],
+['1640405','connect','switches','i-switch','','WiFi Smart Wall Touch Switch',45.99,0,'',null,null,'Touch-panel wall switch in 1 to 4 gang versions — works with Alexa or Google.',['1-4 gang','Required','On/off'],['living','bedroom']],
+['2404810','climate','purifiers','i-vent','airpleasure','Water-Based Air Washer & Purifier',107.99,0,'',null,null,'Water-based air washer that humidifies while it cleans the air.',['Small-mid room','Water + carbon','Low'],['living','bedroom']],
+['2431796','climate','purifiers','i-vent','','Plug-In Ionic Air Purifier, 6-Pack',119.99,0,'',null,null,'Filterless ionic purifiers, sold as a 6-pack for the whole house.',['Per room','Filterless','Low'],['living','bedroom']],
+['2417734','climate','purifiers','i-vent','','H13 HEPA Air Purifier, Large Rooms',142.99,0,'',null,null,'H13 HEPA rated for rooms up to 1200 sq ft.',['1200 sq ft','H13 HEPA','Low'],['living']],
+['2404743','climate','purifiers','i-vent','Vhoiu','Vhoiu H13 HEPA Air Purifier, 2-Pack',142.99,0,'',null,null,'Two H13 HEPA purifiers, sized for bedrooms up to 600 sq ft each.',['600 sq ft','H13 HEPA','Low'],['bedroom']],
+['2409874','climate','purifiers','i-vent','','Plug-In Air Ionizer, 4-Pack',154.99,0,'',null,null,'Filterless ionizers in a 4-pack — one for every main room.',['Per room','Filterless','Low'],['living','bedroom']],
+['2418683','climate','purifiers','i-vent','Chuboor','Chuboor H13 HEPA Air Purifier, Large Rooms',179.99,0,'',null,null,'H13 HEPA with an air-quality indicator, for the largest rooms in the lineup.',['1200 sq ft','H13 HEPA','Low'],['living']],
+['2015190','climate','blinds','i-blind','','WiFi Smart Curtain Motor',71.99,0,'',null,null,'Retrofits an existing Roman rod — WiFi app control, no rewiring.',['—','Rechargeable','Quiet'],['living','bedroom']],
+['2901056','climate','blinds','i-blind','','Zigbee Rechargeable Curtain Motor',105.99,0,'',null,null,'Zigbee curtain motor with a bigger battery for longer runs between charges.',['—','4800mAh','Quiet'],['living','bedroom']],
+['2875251','climate','blinds','i-blind','','WiFi Motor for Venetian Blinds',85.99,0,'',null,null,'For venetian blinds specifically, not fabric curtains — WiFi, Bluetooth or Zigbee.',['—','Rechargeable','Quiet'],['living','office']],
+['2901104','climate','blinds','i-blind','','Outdoor Windproof Curtain Motor',120.99,0,'',null,null,'Built for outdoor use — windproof and waterproof for a balcony or patio.',['—','Rechargeable','Quiet'],['outdoor']],
+['2954785','climate','blinds','i-blind','','Smart Multi-Track Curtain Opener',92.99,0,'',null,null,'Multi-track opener that integrates with the Mi Home ecosystem.',['—','Rechargeable','Quiet'],['living','bedroom']],
+['1640675','outdoor','solar','i-solar','','Solar RGB Floating Pool Light',44.99,0,'',null,null,'Floats on a pond or pool and rotates through colors after dark.',['Dusk-to-dawn','Solar','Waterproof'],['outdoor']],
+['1640617','outdoor','solar','i-solar','','Solar Motion-Sensor Security Wall Light',46.99,0,'',null,null,'Bright output with a motion sensor for the driveway or side gate.',['Dusk-to-dawn','Solar','Weatherproof'],['outdoor']],
+['1641010','outdoor','solar','i-solar','','Solar RGB Floating Pool Light, Waterproof',52.99,0,'',null,null,'Same floating light, RGB and fully waterproof.',['Dusk-to-dawn','Solar','Waterproof'],['outdoor']],
+['1640893','outdoor','solar','i-solar','','Rechargeable Solar Camping Lantern',53.99,0,'',null,null,'60 LEDs that double as a camping lantern or a garden light.',['Multiple hours','Solar + USB','Weatherproof'],['outdoor']],
+['3135469','outdoor','solar','i-solar','','Solar RGB Garden Landscape Lights, 6-Pack',87.99,0,'',null,null,'Six RGB landscape lights for a full garden bed or path.',['Dusk-to-dawn','Solar','IP44'],['outdoor']],
+['2464824','outdoor','solar','i-solar','Vizzlema','Solar Motion-Sensor Outdoor Light',89.99,0,'',null,null,'Motion-triggered floodlight built for hunting use — a different crowd than the rest of the shelf.',['Dusk-to-dawn','Solar','Weatherproof'],['outdoor']],
+['2895341','outdoor','flood','i-flood','','Outdoor Waterproof LED Flood Light',29.99,0,'',null,null,'Mains-powered flood light, available from 30W up to 100W.',['30-100W','Wide beam','Waterproof'],['outdoor']],
+['2890687','outdoor','flood','i-flood','','50W LED Flood Light, Waterproof',25.99,0,'',null,null,'50W with 5000 lumens and a 180° spread — no app, just a switch.',['50W / 5000 lm','180°','IP66'],['outdoor']],
+['2767653','outdoor','flood','i-flood','','50W LED Floodlight for Gardens',26.99,0,'',null,null,'50W flood light with a 360° distribution curve for garden paths.',['50W / 4800 lm','360°','Weatherproof'],['outdoor']],
+['1971203','indoor','strips','i-strip','Dreamcolor','Dreamcolor WS2812B Bluetooth RGB Strip',27.99,0,'',null,null,'Bluetooth app control over an addressable RGB strip — no hub needed.',['5 m','Addressable','Cuttable'],['living','bedroom']],
+['1640566','indoor','strips','i-strip','','32ft RGB LED Strip Light with Remote',32.99,0,'',null,null,'32 feet of RGB strip with a physical remote included.',['32 ft','1 zone','Cuttable'],['living']],
+['1640467','indoor','tv','i-tv','','USB RGB LED TV Backlight Strip',41.99,0,'',null,null,'USB-powered TV backlight strip with a 24-key remote.',['Any size','Remote','1 zone'],['living','gaming']],
+['3090631','indoor','table','i-table','','LED Water Ripple Night Light',29.99,0,'HOT',null,null,'A rotating water-ripple effect projected onto the ceiling and walls.',['Desktop','16 colors','USB'],['bedroom']],
+['1961616','indoor','table','i-table','','Jellyfish Mood Lamp, Voice Control',107.99,0,'',null,null,'Jellyfish silhouette lamp with voice control — the only one in this shelf that responds to speech.',['Desktop','Voice control','USB'],['bedroom','living']],
+['2318351','indoor','gaming','i-panel','SilverStone','SilverStone RGB LED Light Strip, 2-Pack',59.99,0,'',null,null,"SilverStone's own RGB strip — syncs with ASUS Aura, MSI Mystic Light and other PC RGB ecosystems.",['Motherboard sync','2 strips','Low'],['gaming']],
+['3048179','homecare','vacuums','i-vacuum','','Smart Sweeping Robot Vacuum',66.99,0,'',null,null,'WiFi and app control — schedule cleanings and switch modes from your phone.',['Standard','~100 min','App'],['living']],
+['2024881','homecare','vacuums','i-vacuum','','Robot Vacuum Cleaner, WiFi & App',266.99,0,'',null,null,'A pricier robot vacuum with the same WiFi app control — compare against known brands before choosing this one.',['Standard','~100 min','App'],['living']],
+['2074739','homecare','feeders','i-feeder','','Smart WiFi Pet Feeder (2L)',67.99,0,'',null,null,'2L hopper with WiFi scheduling — good for one cat or a small dog.',['2 L','None','App-scheduled'],['kitchen']],
+['3061540','homecare','feeders','i-feeder','','6-Meal Automatic Feeder with Ice Packs',93.99,0,'',null,null,'Six meals a day with ice packs to keep the food fresh longer.',['6 compartments','None','Up to 6'],['kitchen']],
+['2659346','homecare','feeders','i-feeder','','WiFi Video Pet Feeder with Timer',109.99,0,'',null,null,'Camera and two-way audio — watch and talk to your pet at feeding time.',['4 L','1080P + audio','App-scheduled'],['kitchen','living']],
+['3136134','homecare','feeders','i-feeder','','1080P Smart Pet Feeder with Camera',103.99,0,'',null,null,'1080P camera with a low-food sensor that warns you before the bowl runs dry.',['4 L','1080P','Up to 10'],['kitchen','living']],
+['3147046','climate','fans','i-fan','','Smart WiFi Fan Light Switch',34.99,0,'',null,null,'Wall switch that adds WiFi and voice control to a ceiling fan and light you already own.',['Any ceiling fan','App + voice','Alexa, Google'],['living','bedroom']],
+['3085373','indoor','panels','i-panel','','Modular Smart Splicing LED Panels',83.99,0,'',null,null,'Snap-together modular panels — works with Alexa, Google, Tmall Genie and DuerOS.',['Modular','Bluetooth + app','Expandable'],['living','gaming']],
+['2905285','indoor','panels','i-panel','','Creative Modular LED Wall Light',74.99,0,'',null,null,'Connectable pieces for a custom wall pattern, Bluetooth app control.',['Modular','Bluetooth app','Expandable'],['living','gaming']],
+['2896625','indoor','panels','i-panel','','Smart RGB LED Wall Light',25.99,0,'',null,null,'Compact RGB wall light with real app color control, rated for outdoor use too.',['1 unit','App color control','IP65'],['living','outdoor']],
+['2923741','connect','hubs','i-hub','','Apple HomeKit Zigbee Smart Hub',83.99,0,'',null,null,"Zigbee hub with Apple HomeKit certification — for the iPhone ecosystem the rest of the store doesn't cover.",['Multiple','Zigbee','HomeKit'],['living']],
+['2778957','climate','thermostats','i-therm','','WiFi Smart Central AC Thermostat',51.99,0,'',null,null,'WiFi thermostat that controls central air conditioning directly.',['—','Central AC','—'],['living']],
+['2620708','outdoor','path','i-path','','Solar LED Ice Cube Pathway Light',13.99,0,'HOT',null,null,'Ice-cube-shaped solar stake — a more modern look than the classic path light.',['1 light','LED','Waterproof'],['outdoor']],
+['2931141','outdoor','path','i-path','','Solar Pathway Projection Light',8.99,0,'',null,null,'Projects a light pattern onto the ground in addition to lighting the path.',['1 light','LED + pattern','Waterproof'],['outdoor']],
+['2930238','outdoor','path','i-path','','Solar Square Lawn Pathway Light',2.99,0,'HOT',null,null,'Classic square solar stake — the simplest way to start lighting a path.',['1 light','LED','Waterproof'],['outdoor']],
+['3090714','outdoor','permanent','i-string','','45M RGB Permanent Outdoor Lights',92.99,0,'',null,null,"The listing itself calls this \"Permanent Outdoor Lights\" — 45 meters of coverage with app scene control.",['45 m','App scenes','Outdoor'],['outdoor']],
+['2419849','outdoor','string','i-string','Electight','Electight 100-LED RGB Fairy Lights',38.99,0,'HOT',null,null,'100 LEDs over 33 feet, app and remote control, rated IP65 for outdoor use.',['33 ft','100 LEDs','IP65'],['outdoor']],
+['2931057','outdoor','string','i-string','','RGB LED Fairy String Lights',26.99,0,'',null,null,'App-controlled fairy lights for a patio or facade.',['—','RGB','App control'],['outdoor']],
+['2866076','outdoor','string','i-string','','RGB IC Fairy String Lights',8.99,0,'',null,null,'Entry-level app-controlled string lights.',['—','RGB IC','App control'],['outdoor']],
+['3065192','indoor','proj','i-proj','','Galaxy Star Projector',48.99,0,'',null,null,'360° rotation for wider ceiling coverage than the basic projectors.',['360°','Multiple','Yes'],['bedroom']],
+['2896903','indoor','proj','i-proj','','Bluetooth Music Star Projector',25.99,0,'',null,null,'Syncs rotation and color to music over Bluetooth.',['Room','Music sync','Yes'],['bedroom','gaming']],
+['3113617','indoor','proj','i-proj','','Astronaut Rocket Star Projector',18.99,0,'',null,null,'Astronaut/rocket theme — the most-requested design in this category.',['Room','Multiple','—'],['bedroom']],
+['3063312','indoor','proj','i-proj','','LED Star Projector Night Light',9.99,0,'HOT',null,null,'Bluetooth music sync plus a physical remote, at the lowest price in this category.',['Room','Music + remote','—'],['bedroom']],
+['2777259','indoor','ceiling','i-ceiling','','Bluetooth Mesh Smart Ceiling Light',4.99,0,'',null,null,'Bluetooth mesh ceiling light with a built-in music timer.',['—','5W','Flush'],['bedroom','living']],
+['1949846','indoor','floor','i-floor','','Nordic RGB Corner Floor Lamp',62.99,0,'',null,null,'Metal and aluminum finish for a more premium look than the plastic corner lamps.',['Corner','RGB','Metal'],['living','bedroom']],
+['2897066','indoor','floor','i-floor','','RGB Floor Lamp, Remote & Voice Control',34.99,0,'HOT',null,null,'Voice control on top of the usual remote — the only floor lamp here that responds to speech.',['Corner','RGB','Voice + remote'],['living','bedroom']],
+['2922500','indoor','proj','i-proj','','Smart WiFi Star Projector Night Light',56.99,0,'',null,null,'WiFi projector with an app graffiti mode — draw your own starfield instead of picking a preset.',['Room','App graffiti','—'],['bedroom']],
+['1914164','indoor','bulbs','i-bulb','','Smart LED Bulb with Alexa Voice Control',20.99,0,'',null,null,'Bluetooth mesh bulb that also answers to Alexa — every bulb repeats the signal so the whole home stays in range.',['60W equiv','Soft white','A19 (E26)'],['living','bedroom']],
+['2766575','indoor','bulbs','i-bulb','','COB LED Light Engine, Full Spectrum',2.99,0,'',null,null,'Full-spectrum COB LED engine for fixtures and grow lights — a swap-in replacement bulb, not app-controlled.',['20/30/50W','Full spectrum','Standard COB'],['living']],
+['1640677','indoor','proj','i-proj','','Astronaut Galaxy Projector, Remote Control',110.99,0,'',null,null,'17 nebula and star modes with a handheld remote — the only projector here without app or WiFi control.',['Room','17 modes','Remote only'],['bedroom']],
+['2933600','indoor','proj','i-proj','','360° Galaxy Projector Lamp',28.99,0,'',null,null,'Budget 360° starry-sky projector for the ceiling — controls live on the unit itself, no app.',['360°','Nebula + stars','On-unit controls'],['bedroom']],
+['1953736','indoor','vidproj','i-proj','','Vista Pro HY300 HD Projector',124.99,0,'',null,null,'720p home-theater projector for movie nights and gaming — the only screen-and-picture projector in the store.',['1280×720','120 ANSI lm','—'],['living','bedroom']],
+['3206743','climate','fans','i-fan','','Portable 3-in-1 Air Cooler Fan',22.99,0,'',null,null,'Evaporative mini air cooler for a desk or nightstand — touchscreen controls, no app.',['2 speeds','—','No'],['office','bedroom']],
+['2776183','climate','humid','i-humid','','350ML Smart Aroma Diffuser & Humidifier',69.99,0,'',null,null,'Bluetooth app sets mist level and timer from your phone — doubles as a diffuser with a 7-color light.',['350 ml','10-15 hrs','Bluetooth app'],['bedroom','living']],
+['3129590','connect','speakers','i-speaker','','Bluetooth Speaker Ceiling Lamp',26.99,0,'',null,null,'RGB ceiling light with a built-in Bluetooth speaker and WiFi/app control — two fixtures in one.',['RGB','WiFi + app','Built-in speaker'],['living','bedroom']],
+['1972075','outdoor','irrigation','i-sprinkler','','Bluetooth Sprinkler Timer',41.99,0,'',null,null,'Screws onto any garden tap — set watering schedules from the app instead of a dial.',['1 zone','Bluetooth app','IP55'],['outdoor']],
+['2090301','security','baby','i-baby','','1080P WiFi Baby Monitor Camera',81.99,0,'',null,null,'Pan/tilt 1080p camera with night vision and phone app — watch the nursery from any room.',['1080P','Night vision','WiFi app'],['bedroom']],
+['2001535','homecare','litter','i-litter','','Self-Cleaning Litter Box',439.99,0,'',null,null,'Auto-scoops after every visit and tracks it from the app — 2 weeks between cleanouts for one cat.',['10 L bin','2 weeks','1-2 cats'],['living']],
+['2585383','indoor','tv','i-tv','','Immersive TV Backlight Kit, App Control',63.99,0,'',null,null,'Camera-driven backlight that syncs to your TV screen in real time, controlled from the app.',['Camera sync','App control','3.8m or 5m'],['living','gaming']],
+['2616034','indoor','gaming','i-panel','','Smart LED Light Bars, Music Sync (120cm)',68.99,0,'',null,null,'App-controlled light bar that syncs color to music for a desk or gaming corner.',['120cm','App control','Music sync'],['gaming','living']],
+['2904850','indoor','table','i-table','','LED Ambient Light, App & Voice Control',35.99,0,'HOT',null,null,'Bluetooth ambient lamp with app control and voice activation for quick color changes.',['Bluetooth','App control','Voice control'],['bedroom','living']],
+['2881134','connect','switches','i-switch','','Zigbee Smart Scene Switch, Wireless Knob',41.99,0,'',null,null,'Battery-powered wireless knob that triggers Zigbee scenes from anywhere in the room.',['Zigbee 3.0','CR2032 battery','30m range'],['living','bedroom']],
+['2764085','security','sensors','i-sensor','','WiFi Door & Window Sensor',43.99,0,'',null,null,'2.4GHz WiFi sensor that alerts your phone the moment a door or window opens, no hub needed.',['WiFi 2.4GHz','No hub needed','Compact'],['living','bedroom']],
+['2904678','indoor','floor','i-floor','','LED Creative Atmosphere Lamp, App Control',135.99,0,'',null,null,'Frosted-finish atmosphere lamp with app-controlled brightness and color for a bedside or desk.',['App control','Frosted finish','43cm tall'],['living','bedroom']],
+['2006454','indoor','bulbs','i-bulb','','15W WiFi Smart RGB LED Bulb',85.99,0,'',null,null,'WiFi-controlled color bulb with adjustable brightness, no hub required.',['15W','E27/B22','WiFi'],['living','bedroom']],
+
+/* ===== 2026-09-07: 10 produtos estratégicos (segurança/valor, fuga de luz) + 8 outros publicados no mesmo lote ===== */
+['1904517','security','alarms','i-siren','','WiFi Glass Break & Vibration Alarm',39.58,0,'',null,null,"Hears the window break, not just the door open — 130dB is loud enough to end it there.",['130 dB','WiFi','Window/door'],['living','bedroom']],
+['2764305','security','alarms','i-siren','','WiFi Gas Leak Alarm',66.04,0,'',null,null,"Pushes an alert to your phone the moment it smells gas — works while you're out.",['WiFi','0-50°C','Battery'],['kitchen']],
+['2924537','security','sensors','i-sensor','Tuya','Tuya WiFi Door Sensor + PIR',24.55,0,'',null,null,'Door sensor and motion sensor in one — Alexa-compatible, no hub required.',['WiFi 2.4GHz','PIR motion','Alexa'],['living','bedroom']],
+['2310832','connect','plugs','i-plug','Geeni','Geeni Surge Smart Power Strip',119.59,0,'',null,null,'Six outlets and real surge protection, each one schedulable from the app.',['6 outlets + 2 USB','12000J surge','Alexa/Google'],['office','living']],
+['2646964','homecare','trackers','i-gps','','G15P Pet GPS Tracker',98.54,0,'',null,null,'Clips onto any collar and tells you exactly where they wandered off to.',['GPS+GSM','120h battery','IPX5'],[]],
+['2881187','security','doorbells','i-bell','','Cat-Eye Video Doorbell',89.65,0,'',null,null,"Replaces the peephole with a live feed — see who's there before you decide to answer.",['Night vision','Color video','Gold/Silver'],[]],
+['2771497','outdoor','irrigation','i-sensor','Xiaomi','Xiaomi Plant Monitor',53.83,0,'',null,null,"Tells your phone what the plant can't — before the leaves do.",['Bluetooth 4.1','CR2032','Compact'],['living']],
+['2072113','homecare','litter','i-litter','UPFAS','UPFAS 100L Self-Cleaning Litter Box',799.16,0,'',null,null,'Extra-large bin and anti-pinch sensors — built for multi-cat homes that need fewer scoops.',['100L bin','App control','Multi-cat'],[]],
+['2895495','indoor','bulbs','i-bulb','','GU10 Dimmable Smart Bulb',22.73,0,'',null,null,'Spotlight-size RGB bulb for track lighting and recessed fixtures.',['5W RGB+W','Alexa/Google','30,000h'],['living','kitchen']],
+['2896994','indoor','proj','i-proj','','SK20 Star Projector',104.24,0,'',null,null,'Seven-color star field for the ceiling — dinner mood or bedtime, one tap apart.',['7 colors','App control','Compact'],['bedroom']],
+['3136567','indoor','table','i-table','','RGB Symphony Rotating Lamp',66.54,0,'',null,null,'Tilts flat on a desk or up on a wall — same RGB symphony either way.',['180° rotating','App+remote','Aluminum'],['living','office']],
+['1965227','indoor','floor','i-floor','','Symphony RGB Corner Floor Lamp',57.36,0,'',null,null,'Slim enough for a corner, bright enough to color the whole room.',['3 heights','Bluetooth+app','Aluminum alloy'],['living','bedroom']],
+['2906113','indoor','tv','i-tv','','TV Backlight Strip (Bluetooth)',31.83,0,'',null,null,'Bias lighting that syncs to the screen — less eye strain, more mood.',['5V USB','Bluetooth app','Music sync'],['living','gaming']],
+['1913253','security','cameras','i-cam','','360° Bulb Camera (E27)',100.93,0,'',null,null,'Screws into any E27 socket and quietly covers the whole room.',['1080P','Night vision','Two-way audio'],['living']],
+['2782170','indoor','bulbs','i-bulb','','RGBW Smart Bulb (WiFi+BT)',29.91,0,'',null,null,'Warm white for every day, full color for the nights that need it.',['9W RGB+W','WiFi+Bluetooth','30,000h'],['living','bedroom']],
+['2772422','indoor','strips','i-strip','','LED Bluetooth RGB Strip (IP67)',104.69,0,'',null,null,'Waterproof enough for the patio, bright enough for the party inside.',['5m/10m','IP67','Music sync'],['outdoor','living']],
+];
+/* Só mostra produtos com link real configurado em WIX_SLUG (evita cliente clicar em algo que não existe).
+   Pra "publicar" um produto do catálogo de exemplo: conecte-o no Zendrop e adicione a linha em WIX_SLUG. */
+const P=RAW.map(r=>({id:r[0],nav:r[1],sub:r[2],ic:r[3],brand:r[4],name:r[5],price:r[6],was:r[7]||null,
+  flag:r[8]||null,rate:r[9],rev:r[10],d:r[11],sp:r[12],rooms:r[13]}))
+  .filter(p=>!WIX_MODE||WIX_SLUG[p.id]);
+const bySub=k=>P.filter(p=>p.sub===k);
+const byNav=k=>P.filter(p=>p.nav===k);
+const subOf=k=>NAV.flatMap(n=>n.subs).find(s=>s.k===k);
+const navOf=k=>NAV.find(n=>n.k===k);
+
+/* ============ LIVE PRICE SYNC ============
+   O preço do card não é mais digitado à mão aqui — ele busca direto da própria
+   página real do produto na Wix (mesmo domínio, sem CORS, sem chave de API).
+   Toda página de produto da Wix publica um bloco <script type="application/ld+json">
+   padrão (usado por buscadores) com o preço atual de verdade em offers.price.
+   Isso significa: muda o preço na Wix -> na próxima visita o site já mostra
+   certo, sem precisar editar este arquivo de novo.
+   'price' no RAW acima vira só o valor inicial (evita tela em branco
+   enquanto a busca não termina, e serve de reserva se a busca falhar).
+
+   IMPORTANTE: este código roda dentro de um <iframe> num domínio diferente
+   (algo tipo www-maviehauz-com.filesusr.com), então um fetch() direto para
+   www.maviehauz.com é bloqueado por CORS (testado e confirmado). Por isso
+   pedimos o preço à página PAI (que é o domínio real da loja, sem CORS)
+   via postMessage, e um pequeno script "ponte" colado no Custom Code do
+   site (Configurações > Custom Code, ver instruções enviadas junto) faz
+   o fetch de verdade e responde. Sem esse script colado lá, cai no valor
+   inicial do RAW — não quebra, só não sincroniza. */
+const LIVE_KEY='mavieLivePrices';
+const livePrices=(()=>{try{return JSON.parse(sessionStorage.getItem(LIVE_KEY)||'{}');}catch(e){return{};}})();
+function saveLivePrices(){try{sessionStorage.setItem(LIVE_KEY,JSON.stringify(livePrices));}catch(e){}}
+let _priceReqSeq=0;
+const _pricePending={};
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(!d||d.type!=='MAVIE_PRICE_RESPONSE'||!_pricePending[d.reqId])return;
+  _pricePending[d.reqId](d.price);
+  delete _pricePending[d.reqId];
+});
+function fetchLivePrice(slug){
+  return new Promise(resolve=>{
+    const reqId=++_priceReqSeq;
+    const timer=setTimeout(()=>{delete _pricePending[reqId];resolve(null);},6000);
+    _pricePending[reqId]=price=>{clearTimeout(timer);resolve(price);};
+    try{window.parent.postMessage({type:'MAVIE_PRICE_REQUEST',reqId,slug},STORE_URL);}
+    catch(e){clearTimeout(timer);delete _pricePending[reqId];resolve(null);}
+  });
+}
+async function syncLivePrices(){
+  const ids=Object.keys(WIX_SLUG);
+  const results=await Promise.all(ids.map(id=>fetchLivePrice(WIX_SLUG[id])));
+  let changed=false;
+  ids.forEach((id,i)=>{
+    const price=results[i];
+    if(price==null)return;
+    if(livePrices[id]!==price){livePrices[id]=price;changed=true;}
+    const p=P.find(x=>x.id===id);
+    if(p)p.price=price;
+  });
+  if(changed)saveLivePrices();
+  refreshVisibleGrids();
+}
+function refreshVisibleGrids(){
+  const vHome=$('#v-home'),vCat=$('#v-cat');
+  if(vHome&&!vHome.hidden){const h=$('#gridHome');if(h)fill(h,P.filter(p=>p.flag==='HOT').slice(0,8));}
+  if(vCat&&!vCat.hidden)renderCat();
+}
+
+/* ============ CARDS ============ */
+const stars=(r,n)=>r?`<div class="stars"><b>${r.toFixed(1)}</b> ★★★★★ <span>(${n.toLocaleString()})</span></div>`:'';
+const flagCls=f=>f==='HOT'?'hot':f==='NEW'?'':'good';
+const card=p=>`<article class="card"><button data-open="${p.id}" style="display:contents;text-align:left">
+  <div class="plate${IMG[p.id]?' has-photo':''}">${p.flag?`<span class="flag ${flagCls(p.flag)}">${p.flag}</span>`:''}${IMG[p.id]?`<img src="${IMG[p.id]}" alt="${p.name}" loading="lazy">`:`<svg><use href="#${p.ic}"/></svg>`}</div>
+  <div class="cbody"><h3>${p.name}</h3>
+    <p class="desc">${p.d}</p>${stars(p.rate,p.rev)}</div></button>
+  <div class="cbody" style="padding-top:0;flex:none"><div class="cfoot">
+    <span class="price">${p.was?`<s>${usd(p.was)}</s>`:''}${usd(p.price)}</span>
+    <button class="add" data-add="${p.id}">Add</button></div></div></article>`;
+const fill=(el,list)=>el.innerHTML=list.length?list.map(card).join(''):'<p class="empty">No products match those filters.</p>';
+
+/* ============ NAV + MEGA MENU ============ */
+$('#nav').innerHTML=NAV.map(n=>`<button class="navb" data-nav="${n.k}" aria-expanded="false">${n.n}</button>`).join('')
+ +`<button class="navb" data-view="rooms">Shop by Room</button>`
+ +`<button class="navb deal" data-view="deals">Deals</button>`
+ +`<button class="navb" data-view="support">Support</button>`;
+
+/* mesma lista, versão gaveta mobile (fora de #nav, então clique abre a categoria direto) */
+$('#mdlist').innerHTML=NAV.map(n=>`<button class="mdbtn" data-nav="${n.k}">${n.n}</button>`).join('')
+ +`<button class="mdbtn" data-view="rooms">Shop by Room</button>`
+ +`<button class="mdbtn deal" data-view="deals">Deals</button>`
+ +`<button class="mdbtn" data-view="support">Support</button>`;
+const openDrawer=o=>{$('#mobiledrawer').hidden=!o;$('#mobilescrim').hidden=!o;};
+$('#openDrawer').onclick=()=>openDrawer(true);
+$('#closeDrawer').onclick=()=>openDrawer(false);
+$('#mobilescrim').onclick=()=>openDrawer(false);
+$('#mdlist').addEventListener('click',()=>openDrawer(false));
+
+let megaOpen=null;
+function openMega(k){
+  const n=navOf(k);megaOpen=k;
+  $('#mega').innerHTML=`<div class="megainner">
+    <div class="subcol">
+      ${n.subs.filter(s=>bySub(s.k).length>0).map(s=>{
+        const list=bySub(s.k);
+        const hot=list.some(p=>p.flag==='HOT'),nw=list.some(p=>p.flag==='NEW');
+        return `<button data-sub="${s.k}">${s.n}
+          ${hot?'<span class="tagx">HOT</span>':nw?'<span class="tagx new">NEW</span>':''}</button>`}).join('')}
+      <button class="allbtn" data-all="${k}">Shop all ${n.n}</button>
+    </div>
+    <div class="megagrid">
+      ${byNav(k).slice(0,6).map(p=>`<button class="mprod" data-open="${p.id}">
+        <div class="mp"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${p.ic}"/></svg></div>
+        <div><div class="mn">${p.flag?`<span class="mf">${p.flag}</span>`:''}${p.name}</div>
+          <div class="mpr">${p.was?`<s>${usd(p.was)}</s> `:''}${usd(p.price)}</div></div></button>`).join('')}
+    </div></div>`;
+  $('#mega').hidden=false;
+  $$('.navb').forEach(b=>b.setAttribute('aria-expanded',String(b.dataset.nav===k)));
+}
+function closeMega(){megaOpen=null;$('#mega').hidden=true;$$('.navb').forEach(b=>b.setAttribute('aria-expanded','false'));}
+$('#nav').addEventListener('click',e=>{
+  const b=e.target.closest('[data-nav]');if(!b)return;
+  megaOpen===b.dataset.nav?closeMega():openMega(b.dataset.nav);
+});
+$('#nav').addEventListener('mouseover',e=>{
+  const b=e.target.closest('[data-nav]');if(b&&megaOpen&&megaOpen!==b.dataset.nav)openMega(b.dataset.nav);
+});
+document.addEventListener('click',e=>{if(!e.target.closest('header'))closeMega();});
+if(MULTI_PAGE)$$('.navb[data-nav]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.nav===PAGE_VIEW)));
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeMega();openC(false);openDrawer(false);}});
+
+/* ============ ROUTING ============ */
+function view(v){
+  $$('[id^=v-]').forEach(s=>s.hidden=s.id!=='v-'+v);
+  closeMega();scrollTo({top:0,behavior:'smooth'});
+}
+let cur={nav:null,sub:'all',brand:'all',sort:'featured',mode:'nav'};
+
+const CAT_HERO_IMG={
+  outdoor:'https://static.wixstatic.com/media/6e512a_df7ab6fd560a4b828022f66df155ca6a~mv2.webp',
+  security:'https://static.wixstatic.com/media/6e512a_df7ab6fd560a4b828022f66df155ca6a~mv2.webp',
+  climate:'https://static.wixstatic.com/media/6e512a_72529a73c14a4af09a25f2459bf749b7~mv2.webp',
+};
+function openCat(navK,subK='all',opts={}){
+  cur={nav:navK,sub:subK,brand:'all',sort:'featured',mode:opts.mode||'nav',room:opts.room,title:opts.title,blurb:opts.blurb,expanded:false};
+  const n=navK?navOf(navK):null;
+  const heroImg=navK&&CAT_HERO_IMG[navK];
+  const catHero=$('#catHero');
+  catHero.hidden=cur.mode!=='nav';
+  catHero.style.backgroundImage=heroImg
+    ?`linear-gradient(180deg,rgba(6,4,12,.05) 0%,rgba(6,4,12,.82) 100%),url('${heroImg}')`
+    :`radial-gradient(120% 140% at 20% 15%,rgba(168,85,247,.35),transparent 60%),linear-gradient(160deg,#1b1330,#0b0714)`;
+  $('#catHeroTitle').textContent=opts.title||(n?n.n:'');
+  $('#catEyebrow').textContent=opts.eyebrow||(n?n.n:'');
+  $('#catTitle').textContent=opts.title||(n?n.n:'');
+  $('#catBlurb').textContent=opts.blurb||(n?n.blurb:'');
+  /* sidebar */
+  const side=$('#sideList');
+  if(cur.mode==='nav'){
+    side.innerHTML=`<button data-sub="all" aria-pressed="${subK==='all'}">All ${n.n}<span class="n">${byNav(navK).length}</span></button>`
+      +n.subs.filter(s=>bySub(s.k).length>0).map(s=>`<button data-sub="${s.k}" aria-pressed="${subK===s.k}">${s.n}<span class="n">${bySub(s.k).length}</span></button>`).join('');
+  }else if(cur.mode==='room'){
+    side.innerHTML=ROOMS.map(r=>`<button data-room="${r.k}" aria-pressed="${cur.room===r.k}">${r.n}<span class="n">${P.filter(p=>p.rooms.includes(r.k)).length}</span></button>`).join('');
+  }else side.innerHTML='';
+  $('#sideList').parentElement.hidden=cur.mode==='deals';
+  $('#shopGrid').classList.toggle('noside',cur.mode==='deals');
+  /* try panel */
+  $('#tryslot').innerHTML='';
+  if(cur.mode==='nav'&&TRY[navK]){$('#tryslot').innerHTML=TRY[navK].html;TRY[navK].init();}
+  buildToolbar();renderCat();view('cat');
+}
+function pool(){
+  if(cur.mode==='room')return P.filter(p=>p.rooms.includes(cur.room));
+  if(cur.mode==='deals')return P.filter(p=>p.was);
+  return cur.sub==='all'?byNav(cur.nav):bySub(cur.sub);
+}
+function buildToolbar(){
+  $('#toolbar').innerHTML=`
+    <select id="sortSel"><option value="featured">Featured</option><option value="low">Price: low to high</option>
+      <option value="high">Price: high to low</option><option value="rate">Top rated</option>
+      <option value="save">Biggest saving</option></select>
+    <span class="count" id="catCount"></span>`;
+}
+function renderCat(){
+  let list=pool().filter(p=>cur.brand==='all'||p.brand===cur.brand);
+  const s=cur.sort;
+  if(s==='low')list=[...list].sort((a,b)=>a.price-b.price);
+  if(s==='high')list=[...list].sort((a,b)=>b.price-a.price);
+  if(s==='rate')list=[...list].sort((a,b)=>b.rate-a.rate);
+  if(s==='save')list=[...list].sort((a,b)=>((b.was||b.price)-b.price)-((a.was||a.price)-a.price));
+  const PAGE_SIZE=12;
+  const c=$('#catCount');if(c)c.textContent=list.length+' product'+(list.length===1?'':'s');
+  const visList=cur.expanded?list:list.slice(0,PAGE_SIZE);
+  fill($('#gridCat'),visList);
+  const loadMore=$('#loadMoreBtn');
+  if(loadMore){
+    if(!cur.expanded&&list.length>PAGE_SIZE){
+      loadMore.hidden=false;
+      loadMore.textContent=`Show ${list.length-PAGE_SIZE} more product${list.length-PAGE_SIZE===1?'':'s'}`;
+    }else loadMore.hidden=true;
+  }
+}
+$('#sideList').addEventListener('click',e=>{
+  const s=e.target.closest('[data-sub]'),r=e.target.closest('[data-room]');
+  if(s){cur.sub=s.dataset.sub;cur.brand='all';cur.expanded=false;
+    $$('#sideList button').forEach(b=>b.setAttribute('aria-pressed',String(b===s)));
+    const sub=subOf(cur.sub);
+    $('#catTitle').textContent=sub?sub.n:navOf(cur.nav).n;
+    $('#catBlurb').textContent=sub?`${bySub(cur.sub).length} products in ${sub.n.toLowerCase()}.`:navOf(cur.nav).blurb;
+    buildToolbar();renderCat();}
+  if(r){cur.room=r.dataset.room;cur.brand='all';cur.expanded=false;
+    $$('#sideList button').forEach(b=>b.setAttribute('aria-pressed',String(b===r)));
+    const rm=ROOMS.find(x=>x.k===cur.room);
+    $('#catTitle').textContent=rm.n;$('#catBlurb').textContent=`Everything we'd put in a ${rm.n.toLowerCase()}.`;
+    buildToolbar();renderCat();}
+});
+$('#toolbar').addEventListener('click',e=>{const c=e.target.closest('[data-brand]');if(!c)return;
+  cur.brand=c.dataset.brand;$$('#toolbar [data-brand]').forEach(x=>x.setAttribute('aria-pressed',String(x===c)));renderCat();});
+$('#toolbar').addEventListener('change',e=>{if(e.target.id==='sortSel'){cur.sort=e.target.value;renderCat();}});
+$('#loadMoreBtn').addEventListener('click',()=>{cur.expanded=true;renderCat();});
+
+document.addEventListener('click',e=>{
+  const nav=e.target.closest('[data-nav]'),sub=e.target.closest('[data-sub]'),all=e.target.closest('[data-all]'),
+        v=e.target.closest('[data-view]'),home=e.target.closest('[data-home]'),room=e.target.closest('[data-roomgo]');
+  if(home){MULTI_PAGE?goPage(PAGE_URL.home):view('home');return;}
+  if(all){MULTI_PAGE?goPage(PAGE_URL[all.dataset.all]):openCat(all.dataset.all);return;}
+  if(sub&&e.target.closest('#mega')){
+    const s=subOf(sub.dataset.sub),parentK=NAV.find(n=>n.subs.includes(s)).k;
+    if(MULTI_PAGE){goPage(PAGE_URL[parentK]);return;}
+    openCat(parentK,s.k,{title:s.n,blurb:`${bySub(s.k).length} products in ${s.n.toLowerCase()}.`});return;
+  }
+  if(nav){
+    if(e.target.closest('#nav'))return; /* dentro do menu do topo: só abre/fecha a bandeja, não navega */
+    if(MULTI_PAGE){goPage(PAGE_URL[nav.dataset.nav]);return;}
+    openCat(nav.dataset.nav);
+    return;
+  }
+  if(room){openCat(null,'all',{mode:'room',room:room.dataset.roomgo,eyebrow:'Shop by room',
+    title:ROOMS.find(r=>r.k===room.dataset.roomgo).n,blurb:`Everything we'd put in a ${ROOMS.find(r=>r.k===room.dataset.roomgo).n.toLowerCase()}.`});return;}
+  if(v){
+    if(v.dataset.view==='rooms'){
+      if(MULTI_PAGE&&PAGE_VIEW!=='home'){goPage(PAGE_URL.home+'?view=rooms');return;}
+      openCat(null,'all',{mode:'room',room:'living',eyebrow:'Shop by room',title:'Living Room',blurb:"Everything we'd put in a living room."});
+    }else if(v.dataset.view==='deals'){
+      if(MULTI_PAGE){goPage(PAGE_URL.deals);return;}
+      openCat(null,'all',{mode:'deals',eyebrow:'Deals',title:'On sale now',blurb:`${P.filter(p=>p.was).length} products currently discounted.`});
+    }else if(v.dataset.view==='support'&&MULTI_PAGE){goPage(PAGE_URL.support);}
+    else view(v.dataset.view);
+  }
+});
+
+/* ============ HOME QUIZ ============ */
+const QUIZ_OPTIONS=[
+ {ic:'i-bulb',label:'Better lighting & mood',nav:'indoor',result:'Bulbs, strips and lamps that set the scene in every room.'},
+ {ic:'i-shield',label:'Feel safer at home',nav:'security',result:'Cameras, locks and sensors that keep an eye on things.'},
+ {ic:'i-therm',label:'More comfort, less bill',nav:'climate',result:'Thermostats, fans and air control that pay for themselves.'},
+ {ic:'i-string',label:'My outdoor space',nav:'outdoor',result:'String lights, flood lights and solar spots for the yard.'},
+ {ic:'i-plug',label:'Just getting started',nav:'connect',result:'Simple plugs and hubs that everything else builds on.'},
+];
+$('#quizOptions').innerHTML=QUIZ_OPTIONS.map((o,i)=>`<button class="quizopt" data-qi="${i}">
+  <span class="qi"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${o.ic}"/></svg></span>
+  <span>${o.label}</span></button>`).join('');
+$('#quizOptions').onclick=e=>{
+  const b=e.target.closest('[data-qi]');if(!b)return;
+  const o=QUIZ_OPTIONS[+b.dataset.qi];
+  $('#qrIcon').innerHTML=`<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${o.ic}"/></svg>`;
+  $('#quizResultTitle').textContent=navOf(o.nav).n;
+  $('#quizResultDesc').textContent=o.result;
+  $('#quizGoBtn').dataset.nav=o.nav;
+  $('#quizStep1').hidden=true;$('#quizStep2').hidden=false;
+};
+$('#quizRetry').onclick=()=>{$('#quizStep1').hidden=false;$('#quizStep2').hidden=true;};
+
+/* ============ HOME CONTENT ============ */
+$('#cats').innerHTML=NAV.map(n=>`<button class="cat" data-nav="${n.k}"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${n.ic}"/></svg>
+  <h3>${n.n}</h3><p>${n.blurb}</p><span class="c">${byNav(n.k).length} products · ${n.subs.filter(s=>bySub(s.k).length>0).length} categories</span></button>`).join('');
+$('#roomsGrid').innerHTML=ROOMS.map(r=>`<button class="room" data-roomgo="${r.k}">${r.n}
+  <span>${P.filter(p=>p.rooms.includes(r.k)).length} products</span></button>`).join('');
+fill($('#gridHome'),P.filter(p=>p.flag==='HOT').slice(0,8));
+syncLivePrices();
+$('#footGrid').innerHTML=`<div><div class="brand" style="margin-bottom:12px">
+    <svg viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 40 26 8l14 20"/><path d="M26 40V22"/><path d="M32 40 46 20l14 20"/><path d="M40 40V29h12v11"/></svg>Mavie Hauz</div>
+    <p style="margin:0;max-width:32ch">Smart living, beautifully designed. ${P.length} curated device${P.length===1?'':'s'}, picked one at a time.</p></div>`
+ +NAV.slice(0,2).map(n=>`<div><h4>${n.n}</h4>${n.subs.slice(0,5).map(s=>`<button data-sub="${s.k}" data-foot>${s.n}</button>`).join('')}</div>`).join('')
+ +`<div><h4>Help</h4><button data-view="support">FAQ</button><button data-view="deals">Deals</button><button data-view="rooms">Shop by room</button></div>`
+ +`<div><h4>Company</h4><button data-view="about">About Us</button><button data-view="contact">Contact</button></div>`
+ +`<div><h4>Policies</h4><button data-view="shipping">Shipping Policy</button><button data-view="returns">Return Policy</button><button data-view="terms">Terms of Service</button><button data-view="privacy">Privacy Policy</button></div>`;
+$('#footGrid').addEventListener('click',e=>{const b=e.target.closest('[data-foot]');if(!b)return;
+  const s=subOf(b.dataset.sub),parentK=NAV.find(n=>n.subs.includes(s)).k;
+  if(MULTI_PAGE){goPage(PAGE_URL[parentK]);return;}
+  openCat(parentK,s.k,{title:s.n,blurb:`${bySub(s.k).length} products in ${s.n.toLowerCase()}.`});});
+
+/* ============ PDP ============ */
+let pdp=null,qty=1;
+function openPDP(id){
+  if(WIX_MODE)return goProduct(id);
+  const p=P.find(x=>x.id===id);if(!p)return;
+  pdp=p;qty=1;
+  const plate=$('.pdplate');
+  plate.classList.toggle('has-photo',!!IMG[p.id]);
+  plate.innerHTML=IMG[p.id]
+    ?`<img src="${IMG[p.id]}" alt="${p.name}" loading="lazy">`
+    :`<svg id="pdpIcon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use id="pdpUse" href="#${p.ic}"/></svg>`;
+  $('#pdpTitle').textContent=p.name;$('#pdpDesc').textContent=p.d;
+  $('#pdpName').textContent=p.name;
+  const n=navOf(p.nav);$('#pdpCat').textContent=n.n;$('#pdpCat').dataset.nav=n.k;
+  $('#pdpPrice').innerHTML=(p.was?`<s style="color:var(--muted);font-size:19px;font-weight:400;margin-right:9px">${usd(p.was)}</s>`:'')+usd(p.price);
+  $('#pdpStars').innerHTML=stars(p.rate,p.rev);
+  $('#qVal').textContent=1;
+  const lbl=subOf(p.sub).lbl;
+  $('#pdpSpecs').innerHTML=lbl.map((l,i)=>`<tr><td>${l}</td><td>${p.sp[i]}</td></tr>`).join('')
+    +`<tr><td>Category</td><td>${subOf(p.sub).n}</td></tr><tr><td>Warranty</td><td>See manufacturer</td></tr>`;
+  fill($('#gridRelated'),bySub(p.sub).filter(x=>x.id!==p.id).slice(0,4));
+  view('product');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)openPDP(b.dataset.open);});
+$('#qPlus').onclick=()=>{qty++;$('#qVal').textContent=qty;};
+$('#qMinus').onclick=()=>{qty=Math.max(1,qty-1);$('#qVal').textContent=qty;};
+$('#pdpAdd').onclick=()=>addToCart(pdp.id,qty);
+
+/* ============ SEARCH ============ */
+$('#q').addEventListener('input',e=>{
+  const t=e.target.value.trim().toLowerCase();if(!t)return;
+  const hits=P.filter(p=>(p.name+' '+p.brand+' '+p.d+' '+subOf(p.sub).n+' '+navOf(p.nav).n).toLowerCase().includes(t));
+  $('#qTitle').textContent=`Results for “${e.target.value.trim()}”`;
+  $('#qCount').textContent=hits.length+' product'+(hits.length===1?'':'s')+' found';
+  fill($('#gridSearch'),hits);view('search');
+});
+
+/* ============ CART ============ */
+const cart=new Map();
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1900);};
+function addToCart(id,n=1){
+  if(WIX_MODE)return goProduct(id);
+  const p=P.find(x=>x.id===id);cart.set(id,(cart.get(id)||0)+n);renderCart();toast(`${p.name} added${n>1?` ×${n}`:''}`);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(b){e.stopPropagation();addToCart(b.dataset.add);}});
+function renderCart(){
+  const n=[...cart.values()].reduce((a,b)=>a+b,0);
+  const badge=$('#cartN');badge.textContent=n;badge.hidden=!n;
+  $('#items').innerHTML=n?[...cart].map(([id,q])=>{const p=P.find(x=>x.id===id);
+    return `<div class="item"><div class="ic"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${p.ic}"/></svg></div>
+      <div class="nm">${p.name}
+        <div class="miniqty"><button data-dec="${id}" aria-label="Decrease">−</button><span>${q}</span><button data-inc="${id}" aria-label="Increase">+</button></div></div>
+      <div class="pr">${usd(p.price*q)}</div></div>`}).join('') : '<p class="empty">Your cart is empty.</p>';
+  const FREE_SHIP_MIN=200;
+  const sub=[...cart].reduce((a,[id,q])=>a+P.find(x=>x.id===id).price*q,0);
+  const freeShip=sub>=FREE_SHIP_MIN;
+  $('#sub').textContent=usd(sub);
+  $('#ship').textContent=sub===0?'—':(freeShip?'Free':'At checkout');
+  $('#tot').textContent=sub===0?usd(0):(freeShip?usd(sub):usd(sub)+' + shipping');
+  $('#freeText').textContent=sub===0?`Free shipping on orders over ${usd(FREE_SHIP_MIN)}`
+    :freeShip?'Free shipping unlocked':`Add ${usd(FREE_SHIP_MIN-sub)} more for free shipping`;
+}
+$('#items').addEventListener('click',e=>{
+  const inc=e.target.closest('[data-inc]'),dec=e.target.closest('[data-dec]');
+  if(inc){cart.set(inc.dataset.inc,cart.get(inc.dataset.inc)+1);renderCart();}
+  if(dec){const id=dec.dataset.dec,q=cart.get(id)-1;q?cart.set(id,q):cart.delete(id);renderCart();}
+});
+const openC=o=>{$('#drawer').hidden=!o;$('#scrim').hidden=!o;};
+/* Wix has no direct linkable URL for the cart (it's a native "Side Cart" popup,
+   only openable from a real Wix Cart Icon element) — so in WIX_MODE our own
+   cart icon can't do anything correct. Hide it; a native Wix Cart Icon element
+   should be placed in the same header spot instead. */
+if(WIX_MODE)$('#openCart').hidden=true;
+$('#openCart').onclick=()=>openC(true);
+$('#closeCart').onclick=()=>openC(false);$('#scrim').onclick=()=>openC(false);
+$('#checkoutBtn').onclick=()=>{};
+renderCart();
+
+/* ============ THEME ============ */
+$('#themeBtn').onclick=()=>{
+  const dark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const next=(document.documentElement.dataset.theme||(dark?'dark':'light'))==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  $('#themeIcon').firstElementChild.setAttribute('href',next==='dark'?'#i-sun':'#i-moon');
+};
+if(matchMedia('(prefers-color-scheme:dark)').matches)$('#themeIcon').firstElementChild.setAttribute('href','#i-sun');
+
+/* ============ LIVE ROOM (home) ============ */
+const DEV=[{k:'lights',ic:'i-bulb',n:'Lighting'},{k:'sec',ic:'i-shield',n:'Security'},{k:'clim',ic:'i-therm',n:'Climate'},{k:'blinds',ic:'i-blind',n:'Blinds'},{k:'audio',ic:'i-speaker',n:'Audio'}];
+$('#devrow').innerHTML=DEV.map(d=>`<div class="dev" data-k="${d.k}" data-on="false">
+  <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#${d.ic}"/></svg><div class="n">${d.n}</div></div>`).join('');
+const SCENES={
+ morning:{a:'rgba(251,191,36,.34)',b:'rgba(96,165,250,.20)',t:'22°C',s:{lights:1,sec:0,clim:1,blinds:1,audio:1}},
+ evening:{a:'rgba(167,139,250,.40)',b:'rgba(236,72,153,.20)',t:'21°C',s:{lights:1,sec:1,clim:1,blinds:0,audio:1}},
+ movie:{a:'rgba(99,102,241,.34)',b:'rgba(167,139,250,.12)',t:'20°C',s:{lights:1,sec:1,clim:1,blinds:0,audio:1}},
+ away:{a:'rgba(120,113,145,.16)',b:'rgba(96,165,250,.07)',t:'18°C',s:{lights:0,sec:1,clim:0,blinds:0,audio:0}}};
+const setDev=(k,on)=>{const el=$(`.dev[data-k="${k}"]`);if(el)el.dataset.on=String(!!on)};
+function applyScene(n){
+  const s=SCENES[n];
+  $('#wash').style.setProperty('--wA',s.a);$('#wash').style.setProperty('--wB',s.b);
+  $('#cove').style.background=s.a.replace(/[\d.]+\)$/,'.85)');
+  $('#roomT').textContent=s.t;
+  Object.entries(s.s).forEach(([k,v])=>setDev(k,v));
+  $$('.scene').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scene===n)));
+}
+$('#scenes').onclick=e=>{const b=e.target.closest('.scene');if(b){applyScene(b.dataset.scene);toast(b.textContent+' scene applied');}};
+function tick(){const d=new Date(),h=d.getHours();
+  $('#clock').textContent=String(h).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  $('#greet').textContent=h<5?'Everything is quiet':h<12?'Good morning':h<18?'Good afternoon':'Good evening';}
+tick();setInterval(tick,10000);applyScene(new Date().getHours()<12?'morning':'evening');
+
+/* ============ CATEGORY TRY-PANELS ============ */
+let timers=[];
+const clearTimers=()=>{timers.forEach(t=>clearInterval(t));timers=[]};
+const TRY={
+ indoor:{html:`<div class="try"><div class="tstage"><div class="bulb" id="bulb"></div></div>
+   <div class="tctl"><span class="demotag">Interactive example</span><h3>Smart bulb · try the controls</h3><p class="lead">A typical smart bulb's app controls — brightness, warmth and color all adjust live.</p>
+   <div class="field"><label>Brightness <span id="brVal">80%</span></label><input type="range" id="br" min="5" max="100" value="80"></div>
+   <div class="field"><label>Warmth <span id="wmVal">3200 K</span></label><input type="range" id="wm" min="2000" max="6500" value="3200"></div>
+   <div class="field"><label>Color</label><div class="swatches" id="swatches"></div></div>
+   <div class="readout"><span>Output<b id="lm">645 lm</b></span><span>Draw<b id="wtt">6.9 W</b></span><span>CRI<b>95</b></span></div></div></div>`,
+  init(){
+   const SW=[['#FFD9A8','2700 K warm'],['#FFFFFF','5000 K neutral'],['#A78BFA','Violet'],['#F472B6','Pink'],['#22D3EE','Cyan'],['#4ADE80','Mint']];
+   $('#swatches').innerHTML=SW.map(([c,l],i)=>`<button class="sw" style="background:${c}" data-c="${c}" title="${l}" aria-label="${l}" aria-pressed="${i===0}"></button>`).join('');
+   let hue='#FFD9A8';
+   const paint=()=>{const b=+$('#br').value/100,el=$('#bulb');
+     el.style.background=hue;el.style.opacity=(.3+b*.7).toFixed(2);
+     el.style.boxShadow=`0 0 ${34+b*112}px ${hue},0 0 ${11+b*38}px ${hue}`;
+     $('#brVal').textContent=Math.round(b*100)+'%';$('#lm').textContent=Math.round(806*b)+' lm';
+     $('#wtt').textContent=(1.1+7.2*b).toFixed(1)+' W';$('#br').style.setProperty('--fill',b*100+'%');};
+   $('#br').oninput=paint;
+   $('#wm').oninput=e=>{const k=+e.target.value,t=(k-2000)/4500;
+     $('#wmVal').textContent=k+' K';e.target.style.setProperty('--fill',t*100+'%');
+     const w=[255,217,168],c=[201,226,255];
+     hue='rgb('+w.map((x,i)=>Math.round(x+(c[i]-x)*t)).join(',')+')';
+     $$('#swatches .sw').forEach(s=>s.setAttribute('aria-pressed','false'));paint();};
+   $('#swatches').onclick=e=>{const s=e.target.closest('.sw');if(!s)return;
+     hue=s.dataset.c;$$('#swatches .sw').forEach(x=>x.setAttribute('aria-pressed',String(x===s)));paint();};
+   $('#wm').style.setProperty('--fill','26.6%');paint();}},
+
+ security:{html:`<div class="try"><div class="tstage" id="camStage"><div class="scan"></div><svg class="shield"><use href="#i-shield"/></svg></div>
+   <div class="tctl"><span class="demotag">Interactive example</span><h3>Security camera · try the controls</h3><p class="lead">Arming runs the entry delay, then reports each sensor as it checks in.</p>
+   <div class="togrow"><button class="toggle" id="armBtn" aria-pressed="false" aria-label="Arm system"></button>
+     <div><div style="font-weight:700" id="armLabel">Disarmed</div><div class="mono" style="font-size:12px;color:var(--muted)" id="armSub">4 sensors idle</div></div></div>
+   <div class="log" id="log"><div><b>--:--</b> System ready.</div></div>
+   <div class="readout"><span>Resolution<b>2560×1440</b></span><span>Night<b>30 m IR</b></span><span>Storage<b>Local + cloud</b></span></div></div></div>`,
+  init(){
+   const S=['Front door','Patio slider','Garage','Motion · hall'];let armed=false,t;
+   const stamp=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+   const add=m=>{const l=$('#log');l.insertAdjacentHTML('afterbegin',`<div><b>${stamp()}</b> ${m}</div>`);while(l.children.length>5)l.lastElementChild.remove();};
+   $('#armBtn').onclick=e=>{armed=!armed;e.currentTarget.setAttribute('aria-pressed',String(armed));
+     $('#camStage').classList.toggle('armed',armed);
+     $('#armLabel').textContent=armed?'Armed — away':'Disarmed';clearInterval(t);
+     if(armed){add('Arming. 30 s entry delay started.');let i=0;
+       t=setInterval(()=>{if(i>=S.length){clearInterval(t);$('#armSub').textContent='4 sensors secure';add('Perimeter secure.');return;}
+         add(S[i]+' — closed and monitored.');$('#armSub').textContent=(++i)+' of 4 checked in';},820);timers.push(t);}
+     else{add('Disarmed by owner.');$('#armSub').textContent='4 sensors idle';}};}},
+
+ climate:{html:`<div class="try"><div class="tstage"><div class="dial" id="dial"><div class="dialv"><b id="tempV">21</b><span>Target °C</span></div></div></div>
+   <div class="tctl"><span class="demotag">Interactive example</span><h3>Smart thermostat · try the controls</h3><p class="lead">Nudge the target. Savings recalculate against a 22 °C baseline.</p>
+   <div class="steppers"><button class="step" id="down" aria-label="Lower target">−</button><button class="step" id="up" aria-label="Raise target">+</button></div>
+   <div class="saveline" id="saveLine">≈ 6% lower heating spend · about $11 a year.</div>
+   <div class="field"><label>Eco schedule <span id="ecoVal">6 h / night</span></label><input type="range" id="eco" min="0" max="12" value="6"></div>
+   <div class="readout"><span>Remote sensors<b>4</b></span><span>Payback<b>~14 mo</b></span><span>Compatible<b>Most HVAC</b></span></div></div></div>`,
+  init(){
+   let temp=21,eco=6;
+   const paint=()=>{$('#tempV').textContent=temp;
+     $('#dial').style.setProperty('--sweep',((temp-14)/16*.78).toFixed(3)+'turn');
+     const d=22-temp,pct=Math.max(0,Math.round(d*6+eco*1.4));
+     const l=$('#saveLine');
+     l.textContent=pct>0?`≈ ${pct}% lower heating spend · about $${(pct*1.9).toFixed(0)} a year.`
+       :d<0?`Above baseline — roughly ${Math.abs(d*6)}% more spend.`:'At baseline — no change in spend.';
+     l.style.color=pct>0?'var(--good)':'var(--warn)';
+     $('#ecoVal').textContent=eco+' h / night';$('#eco').style.setProperty('--fill',eco/12*100+'%');};
+   $('#up').onclick=()=>{temp=Math.min(30,temp+1);paint();};
+   $('#down').onclick=()=>{temp=Math.max(14,temp-1);paint();};
+   $('#eco').oninput=e=>{eco=+e.target.value;paint();};paint();}},
+
+ connect:{html:`<div class="try"><div class="tstage"><div><div class="bars" id="bars"></div>
+     <div class="watt"><span id="wattV">0</span> <small>W drawn now</small></div></div></div>
+   <div class="tctl"><span class="demotag">Interactive example</span><h3>Smart plug · try the controls</h3><p class="lead">Switch an appliance and the meter answers in under a second.</p>
+   <div class="togrow"><button class="toggle" id="plugBtn" aria-pressed="false" aria-label="Toggle outlet"></button>
+     <div><div style="font-weight:700" id="plugLabel">Outlet off</div><div class="mono" style="font-size:12px;color:var(--muted)" id="plugSub">Standby 0.4 W</div></div></div>
+   <div class="field"><label>Appliance</label><div class="swatches" id="appliances" style="gap:7px"></div></div>
+   <div class="readout"><span>Max load<b>16 A</b></span><span>Protocol<b>Matter / Thread</b></span><span>Works offline<b>Yes</b></span></div></div></div>`,
+  init(){
+   const A=[['Kettle',1800],['Desk setup',210],['Heater',1200],['Fridge',95],['Lamp',9]];
+   $('#appliances').innerHTML=A.map(([n,w],i)=>`<button class="sw" style="width:auto;height:auto;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line-2)" data-w="${w}" aria-pressed="${i===0}">${n}</button>`).join('');
+   const bars=$('#bars');bars.innerHTML='<i></i>'.repeat(26);
+   let on=false,target=1800,shown=0,hist=Array(26).fill(0);
+   const t=setInterval(()=>{
+     const want=on?target*(.93+Math.random()*.14):.4;shown+=(want-shown)*.34;
+     $('#wattV').textContent=shown<10?shown.toFixed(1):Math.round(shown);
+     hist.push(shown);hist.shift();const max=Math.max(120,...hist);
+     [...bars.children].forEach((b,i)=>b.style.height=Math.max(2,hist[i]/max*100)+'%');},420);
+   timers.push(t);
+   $('#plugBtn').onclick=e=>{on=!on;e.currentTarget.setAttribute('aria-pressed',String(on));
+     $('#plugLabel').textContent=on?'Outlet on':'Outlet off';
+     $('#plugSub').textContent=on?'Live metering · '+target+' W rated':'Standby 0.4 W';};
+   $('#appliances').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;
+     target=+b.dataset.w;$$('#appliances .sw').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+     if(on)$('#plugSub').textContent='Live metering · '+target+' W rated';};}}
+};
+const _openCat=openCat;openCat=function(...a){clearTimers();return _openCat.apply(this,a)};
+
+/* ============ FAQ ============ */
+const FAQ=[
+ ['Will this work with what I already own?','Compatibility depends on the specific product — most of our devices pair with Alexa or Google Home. Check the "Compatibility" details on each product page before ordering if you rely on a specific ecosystem.'],
+ ['Where do you ship, and how long does it take?','Shipping origin and estimated delivery time are shown on each product page, and the exact cost and timeline for your order appear at checkout before you pay.'],
+ ['Are these genuine products? Is there a warranty?','Yes, every product is genuine and sourced from the listed manufacturer. Warranty terms are set by that manufacturer, not by Mavie Hauz — the specific coverage for each product is noted on its product page.'],
+ ['How hard is the setup?','Most devices connect to your WiFi through a companion app in a few minutes — no special tools needed. Setup steps are included with the product.'],
+ ['What if I change my mind?','Contact us through our Contact page and we will confirm the options for your specific order — see our Return Policy for what is finalized so far.'],
+ ['Do I need a hub to use these devices?','It depends on the product — some connect directly over WiFi, others may need a hub or bridge. This is noted on each product\'s page under "Connectivity."'],
+ ['Who do I contact if something goes wrong?','Reach out through our Contact page with your order number. We read and respond to every message personally.']
+];
+$('#faq').innerHTML=FAQ.map(([q,a],i)=>`<button class="q" aria-expanded="${i===0}" data-i="${i}">${q}<span class="pl">+</span></button>
+  <div class="a" id="a${i}"${i?' hidden':''}>${a}</div>`).join('');
+$('#faq').onclick=e=>{const b=e.target.closest('.q');if(!b)return;
+  const open=b.getAttribute('aria-expanded')==='true';
+  b.setAttribute('aria-expanded',String(!open));$('#a'+b.dataset.i).hidden=open;};
+
+/* ============ INICIALIZAÇÃO POR PÁGINA ============ */
+if(MULTI_PAGE&&PAGE_VIEW!=='home'){
+  const CATS_WITH_NAV=['indoor','outdoor','security','climate','connect'];
+  if(CATS_WITH_NAV.includes(PAGE_VIEW)) openCat(PAGE_VIEW);
+  else if(PAGE_VIEW==='deals') openCat(null,'all',{mode:'deals',eyebrow:'Deals',title:'On sale now',blurb:`${P.filter(p=>p.was).length} products currently discounted.`});
+  else if(PAGE_VIEW==='support') view('support');
+}
+if(MULTI_PAGE&&PAGE_VIEW==='home'&&new URLSearchParams(location.search).get('view')==='rooms'){
+  openCat(null,'all',{mode:'room',room:'living',eyebrow:'Shop by room',title:'Living Room',blurb:"Everything we'd put in a living room."});
+}
+
+/* Reporta a altura real deste catálogo para a página da Wix que o hospeda.
+   A ponte (ponte_altura_wix.html, colada no Custom Code) escuta e redimensiona
+   o container — assim cada categoria fica com a altura exata do seu conteúdo,
+   sem sobra e sem corte. Se a ponte não estiver instalada, nada acontece. */
+(function(){
+  if(window.parent===window) return;
+  const root=document.querySelector('.mvh-root');
+  if(!root) return;
+  let last=0,timer=null,busy=false;
+  function measure(){
+    busy=true;
+    /* neutraliza o min-height:100vh para ler a altura real do conteúdo:
+       sem isso a raiz fica travada no tamanho do frame e nunca reporta mudança */
+    const prev=root.style.minHeight;
+    root.style.minHeight='0px';
+    const h=Math.ceil(root.getBoundingClientRect().height);
+    root.style.minHeight=prev;
+    busy=false;
+    return h;
+  }
+  function report(){
+    const h=measure();
+    if(!h||Math.abs(h-last)<4) return;
+    last=h;
+    try{window.parent.postMessage({type:'MAVIE_HEIGHT',height:h},'*');}catch(e){}
+  }
+  function schedule(){if(busy)return;clearTimeout(timer);timer=setTimeout(report,120);}
+  new MutationObserver(schedule).observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','style','class']});
+  new ResizeObserver(schedule).observe(root);
+  window.addEventListener('load',schedule);
+  [200,600,1500,3000].forEach(t=>setTimeout(schedule,t));
+})();
+})();
+</script>
