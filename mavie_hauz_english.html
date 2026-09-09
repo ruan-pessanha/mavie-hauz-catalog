@@ -104,12 +104,21 @@ body:has(.mvh-root){margin:0}
 .search:focus-within{border-color:var(--accent);width:210px}
 .search input{border:0;background:none;outline:0;width:100%;font-size:14px}
 .search svg{width:15px;height:15px;color:var(--muted);flex:none}
-.iconbtn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;position:relative;transition:background .15s}
+.iconbtn{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;position:relative;transition:background .15s;flex:none}
 .iconbtn:hover{background:var(--sunk)}
 .iconbtn svg{width:19px;height:19px}
-.currency{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:13px;font-weight:700;color:var(--ink-2);white-space:nowrap;transition:background .15s}
+.currency{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--line-2);font-size:13px;font-weight:700;color:var(--ink-2);white-space:nowrap;transition:background .15s;flex:none}
 .currency:hover{background:var(--sunk)}
 .currency svg{width:13px;height:13px;opacity:.6}
+.menuwrap{position:relative;flex:none}
+.dropmenu{position:absolute;top:calc(100% + 8px);right:0;z-index:60;min-width:190px;padding:6px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-lg);
+  max-height:min(60vh,420px);overflow-y:auto}
+.dropmenu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  padding:9px 11px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-2);text-align:left;white-space:nowrap}
+.dropmenu button:hover{background:var(--sunk);color:var(--ink)}
+.dropmenu button[aria-current="true"]{color:var(--accent);background:var(--accent-soft)}
+.dropmenu .sep{height:1px;background:var(--line);margin:6px 4px}
 .badge{position:absolute;top:3px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-family:var(--mono);font-size:10px;font-weight:700;display:grid;place-items:center}
 
 .mega{position:absolute;left:0;right:0;top:100%;z-index:49;overflow:hidden;
@@ -560,10 +569,16 @@ body:has(.mvh-root){margin:0}
     <div class="tools">
       <label class="search"><svg><use href="#i-search"/></svg>
         <input id="q" type="search" placeholder="Search products" aria-label="Search products"></label>
-      <button class="currency" id="currencyBtn" aria-label="Currency: USD">USD ($)<svg><use href="#i-chevron"/></svg></button>
+      <div class="menuwrap">
+        <button class="currency" id="currencyBtn" aria-haspopup="true" aria-expanded="false"><span id="curLabel">USD ($)</span><svg><use href="#i-chevron"/></svg></button>
+        <div class="dropmenu" id="currencyMenu" hidden></div>
+      </div>
       <button class="iconbtn" id="themeBtn" aria-label="Switch theme"><svg id="themeIcon"><use href="#i-moon"/></svg></button>
       <button class="iconbtn" id="openCart" aria-label="Open cart"><svg><use href="#i-cart"/></svg><span class="badge" id="cartN" hidden>0</span></button>
-      <button class="iconbtn" id="accountBtn" aria-label="Account"><svg><use href="#i-user"/></svg></button>
+      <div class="menuwrap">
+        <button class="iconbtn" id="accountBtn" aria-label="Account" aria-haspopup="true" aria-expanded="false"><svg><use href="#i-user"/></svg></button>
+        <div class="dropmenu" id="accountMenu" hidden></div>
+      </div>
     </div>
   </div>
   <div class="mega" id="mega" hidden></div>
@@ -1128,7 +1143,22 @@ function goPage(path){
 }
 
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const usd=n=>'$'+n.toFixed(2);
+/* Moeda ativa: a loja Wix aceita várias e troca por ?currency=XXX.
+   Os preços do RAW estão em USD; quando a moeda é outra, os valores
+   reais chegam já convertidos pela ponte de preço (a Wix converte no
+   próprio JSON-LD do produto). Até chegarem, usamos a taxa derivada do
+   primeiro par conhecido — nunca uma taxa inventada. */
+const CUR=(()=>{try{const c=new URLSearchParams(location.search).get('currency');
+  return c&&/^[a-zA-Z]{3}$/.test(c)?c.toUpperCase():'USD';}catch(e){return 'USD';}})();
+let FX=1,FX_READY=CUR==='USD'; /* USD -> CUR, vinda dos preços reais da Wix */
+/* usd() só FORMATA: os valores em P já são mantidos na moeda de exibição.
+   Em moeda estrangeira, antes de sabermos a taxa real da Wix mostramos um
+   traço — melhor do que exibir por um instante um valor em dólar com o
+   símbolo de outra moeda. */
+const usd=n=>{
+  if(!FX_READY)return '—';
+  try{return new Intl.NumberFormat(undefined,{style:'currency',currency:CUR}).format(n);}
+  catch(e){return '$'+Number(n).toFixed(2);}};
 /* abre a loja real numa aba nova — mais confiável que navegar a aba atual */
 const goWix=path=>{
   const a=document.createElement('a');
@@ -1315,7 +1345,7 @@ const RAW=[
 ];
 /* Só mostra produtos com link real configurado em WIX_SLUG (evita cliente clicar em algo que não existe).
    Pra "publicar" um produto do catálogo de exemplo: conecte-o no Zendrop e adicione a linha em WIX_SLUG. */
-const P=RAW.map(r=>({id:r[0],nav:r[1],sub:r[2],ic:r[3],brand:r[4],name:r[5],price:r[6],was:r[7]||null,
+const P=RAW.map(r=>({id:r[0],nav:r[1],sub:r[2],ic:r[3],brand:r[4],name:r[5],price:r[6],usdPrice:r[6],was:r[7]||null,
   flag:r[8]||null,rate:r[9],rev:r[10],d:r[11],sp:r[12],rooms:r[13]}))
   .filter(p=>!WIX_MODE||WIX_SLUG[p.id]);
 const bySub=k=>P.filter(p=>p.sub===k);
@@ -1341,9 +1371,15 @@ const navOf=k=>NAV.find(n=>n.k===k);
    site (Configurações > Custom Code, ver instruções enviadas junto) faz
    o fetch de verdade e responde. Sem esse script colado lá, cai no valor
    inicial do RAW — não quebra, só não sincroniza. */
-const LIVE_KEY='mavieLivePrices';
+const LIVE_KEY='mavieLivePrices_'+CUR; /* cache separado por moeda */
 const livePrices=(()=>{try{return JSON.parse(sessionStorage.getItem(LIVE_KEY)||'{}');}catch(e){return{};}})();
 function saveLivePrices(){try{sessionStorage.setItem(LIVE_KEY,JSON.stringify(livePrices));}catch(e){}}
+/* Preços em cache já estão na moeda ativa — aplica antes da primeira
+   renderização, e com isso já dá pra derivar a taxa sem esperar a rede. */
+P.forEach(p=>{const c=livePrices[p.id];
+  if(c!=null){p.price=c;
+    if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=c/p.usdPrice;if(r>0&&isFinite(r)){FX=r;FX_READY=true;}}}});
+if(CUR!=='USD'&&FX_READY)P.forEach(p=>{if(livePrices[p.id]==null)p.price=p.usdPrice*FX;});
 let _priceReqSeq=0;
 const _pricePending={};
 window.addEventListener('message',e=>{
@@ -1370,8 +1406,17 @@ async function syncLivePrices(){
     if(price==null)return;
     if(livePrices[id]!==price){livePrices[id]=price;changed=true;}
     const p=P.find(x=>x.id===id);
-    if(p)p.price=price;
+    if(p){
+      p.price=price; /* já vem na moeda ativa, convertido pela própria Wix */
+      /* deriva a taxa real a partir do primeiro par (USD original x valor Wix) */
+      if(CUR!=='USD'&&!FX_READY&&p.usdPrice>0){const r=price/p.usdPrice;
+        if(r>0&&isFinite(r)){FX=r;FX_READY=true;}}
+    }
   });
+  /* converte os que ainda não receberam preço ao vivo, usando a taxa real */
+  if(CUR!=='USD'&&FX_READY){
+    P.forEach(p=>{if(livePrices[p.id]==null)p.price=p.usdPrice*FX;});
+  }
   if(changed)saveLivePrices();
   refreshVisibleGrids();
 }
@@ -1676,8 +1721,64 @@ const openC=o=>{$('#drawer').hidden=!o;$('#scrim').hidden=!o;};
    only openable from a real Wix Cart Icon element) — so in WIX_MODE our own
    cart icon can't do anything correct. Hide it; a native Wix Cart Icon element
    should be placed in the same header spot instead. */
-if(WIX_MODE)$('#openCart').hidden=true;
-$('#openCart').onclick=()=>openC(true);
+/* In Wix mode the simulated cart holds nothing real, so send the icon to the
+   store's actual cart page instead of opening the local drawer. */
+if(WIX_MODE){
+  $('#openCart').onclick=()=>goWix('/cart-page');
+}else{
+  $('#openCart').onclick=()=>openC(true);
+}
+
+/* ============ MENUS DE MOEDA E CONTA ============
+   Moeda: a loja Wix converte de verdade via ?currency=XXX (testado) — o menu
+   só navega, quem converte é a Wix, inclusive no checkout.
+   Conta: leva às páginas de membro reais da loja. */
+const CURRENCIES=[['USD','$'],['EUR','€'],['GBP','£'],['BRL','R$'],['CAD','C$'],['AUD','AU$'],['MXN','$'],['JPY','¥']];
+const ACCOUNT_LINKS=[['My Orders','/my-orders'],['My Wishlist','/my-wishlist'],['Account Settings','/account-settings']];
+
+function curLabel(code){const f=CURRENCIES.find(c=>c[0]===code);return f?`${f[0]} (${f[1]})`:code;}
+function goCurrency(code){
+  const u=new URL(location.href);
+  u.searchParams.set('currency',code);
+  location.href=u.toString();
+}
+function closeMenus(except){
+  [['#currencyMenu','#currencyBtn'],['#accountMenu','#accountBtn']].forEach(([m,b])=>{
+    if(m===except)return;
+    const el=$(m),btn=$(b);
+    if(el)el.hidden=true;
+    if(btn)btn.setAttribute('aria-expanded','false');
+  });
+}
+function toggleMenu(menuSel,btnSel){
+  const menu=$(menuSel),btn=$(btnSel);
+  if(!menu||!btn)return;
+  const willOpen=menu.hidden;
+  closeMenus(willOpen?menuSel:null);
+  menu.hidden=!willOpen;
+  btn.setAttribute('aria-expanded',String(willOpen));
+}
+(function initHeaderMenus(){
+  const cl=$('#curLabel');if(cl)cl.textContent=curLabel(CUR);
+  const cm=$('#currencyMenu');
+  if(cm){
+    cm.innerHTML=CURRENCIES.map(([code,sym])=>
+      `<button data-cur="${code}"${code===CUR?' aria-current="true"':''}><span>${code} (${sym})</span></button>`).join('');
+    cm.addEventListener('click',e=>{const b=e.target.closest('[data-cur]');if(!b)return;
+      if(b.dataset.cur===CUR){closeMenus();return;}
+      goCurrency(b.dataset.cur);});
+  }
+  const am=$('#accountMenu');
+  if(am){
+    am.innerHTML=ACCOUNT_LINKS.map(([label,path])=>`<button data-acc="${path}">${label}</button>`).join('');
+    am.addEventListener('click',e=>{const b=e.target.closest('[data-acc]');if(!b)return;
+      closeMenus();goWix(b.dataset.acc);});
+  }
+  const cb=$('#currencyBtn');if(cb)cb.onclick=e=>{e.stopPropagation();toggleMenu('#currencyMenu','#currencyBtn');};
+  const ab=$('#accountBtn');if(ab)ab.onclick=e=>{e.stopPropagation();toggleMenu('#accountMenu','#accountBtn');};
+  document.addEventListener('click',()=>closeMenus());
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenus();});
+})();
 $('#closeCart').onclick=()=>openC(false);$('#scrim').onclick=()=>openC(false);
 $('#checkoutBtn').onclick=()=>{};
 renderCart();
