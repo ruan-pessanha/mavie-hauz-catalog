@@ -496,8 +496,8 @@ body:has(.mvh-root){margin:0}
 .rex-pin .dot{width:30px;height:30px;border-radius:50%;background:rgba(15,13,22,.55);backdrop-filter:blur(3px);border:1.5px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.35);transition:transform .15s,border-color .15s}
 .rex-pin .dot::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff}
 .rex-pin:hover .dot,.rex-pin[aria-expanded="true"] .dot{transform:scale(1.12);border-color:var(--accent)}
-.rex-pin .lbl{font-size:11.5px;font-weight:700;color:#fff;background:rgba(15,13,22,.7);padding:3px 9px;border-radius:999px;white-space:nowrap;opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s;pointer-events:none}
-.rex-pin:hover .lbl,.rex-pin[aria-expanded="true"] .lbl{opacity:1;transform:translateY(0)}
+.rex-pin .lbl{font-size:11.5px;font-weight:700;color:#fff;background:rgba(15,13,22,.72);backdrop-filter:blur(3px);padding:3px 9px;border-radius:999px;white-space:nowrap;pointer-events:none;transition:transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.rex-pin:hover .lbl,.rex-pin[aria-expanded="true"] .lbl{transform:translateY(-2px)}
 .rex-card{position:absolute;transform:translate(-50%,10px);top:100%;left:50%;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.15),0 16px 40px -16px rgba(0,0,0,.5);padding:12px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
 .rex-pin[aria-expanded="true"] .rex-card{opacity:1;pointer-events:auto;transform:translate(-50%,4px)}
 .rex-card .k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -2005,11 +2005,10 @@ tick();setInterval(tick,10000);applyScene(new Date().getHours()<12?'morning':'ev
    de verdade do catálogo — cada pino abre um mini-card com nome, preço e
    link direto pra página do produto na Wix. */
 const REX_PINS=[
- {x:11,y:70,label:'Floor lamp',id:'2897066'},
- {x:81,y:36,label:'TV backlight',id:'2585383'},
- {x:84,y:73,label:'Smart plug',id:'2295971'},
- {x:87,y:80,label:'Security camera',id:'2289857'},
- {x:47,y:39,label:'Smart curtains',id:'2015190'}
+ {x:7.5,y:45,label:'Floor lamp',id:'2897066'},
+ {x:81,y:43,label:'TV backlight',id:'2585383'},
+ {x:79,y:72,label:'Smart plug',id:'2295971'},
+ {x:62,y:39,label:'Smart curtains',id:'2015190'}
 ];
 (function initRoomExplorer(){
   const stage=$('#rexStage'),pinsEl=$('#rexPins');
