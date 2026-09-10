@@ -527,6 +527,23 @@ body:has(.mvh-root){margin:0}
   .rex-pin .lbl{display:none}
   .rex-pin[aria-expanded="true"] .lbl{display:block;font-size:10.5px;padding:3px 7px}
 }
+
+/* ============ BUNDLES ("Complete the look") ============ */
+.bundles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.bundle{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.bundle .bhead{display:flex;align-items:flex-start;gap:10px}
+.bundle .bicon{font-size:22px;line-height:1}
+.bundle h3{font-size:16px;margin:0 0 2px}
+.bundle .bblurb{font-size:12.5px;color:var(--muted);margin:0}
+.bundle .bitems{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bundle .bitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.bundle .bitem:last-child{border-bottom:0}
+.bundle .bitem button{font:inherit;text-align:left;background:none;border:0;padding:0;color:var(--ink);font-size:12.5px;cursor:pointer;flex:1}
+.bundle .bitem button:hover{color:var(--accent)}
+.bundle .bitem .bprice{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.bundle .bfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
+.bundle .btotal b{font-family:var(--mono);font-size:16px}
+.bundle .btotal span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -736,6 +753,11 @@ body:has(.mvh-root){margin:0}
     <div class="sechead"><div><h2>Featured products</h2><p>Smart upgrades worth discovering.</p></div>
       <button class="link" data-nav="indoor">Browse all products →</button></div>
     <div class="grid" id="gridHome"></div>
+  </section></div>
+
+  <div class="wrap"><section style="padding-top:16px">
+    <div class="sechead"><div><h2>Complete the look</h2><p>Products that pair well together, picked as a set — priced individually, add what you want.</p></div></div>
+    <div class="bundles" id="bundleGrid"></div>
   </section></div>
 
   <div class="wrap"><section style="padding-top:8px">
@@ -2076,6 +2098,40 @@ const REX_PINS=[
     stage.classList.toggle('on',on);
     $$('button',tg).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
   });
+})();
+
+/* ============ BUNDLES ("Complete the look") ============
+   Sem integração com o carrinho real da Wix (o "Add" do catálogo, em
+   WIX_MODE, já é só um atalho pra página do produto — não existe
+   endpoint público pra adicionar vários itens ao carrinho de uma vez, e
+   aplicar desconto de verdade exige um cupom criado no painel da Wix,
+   fora do alcance deste arquivo). Por isso este bloco NÃO promete "10%
+   off" nem finaliza a compra sozinho — é uma vitrine de produtos que
+   combinam entre si, com preço somado como referência; cada item leva
+   pra sua página real, igual ao resto do catálogo. Prometer um desconto
+   que o checkout não aplica seria enganar o cliente. */
+const BUNDLES=[
+ {icon:'🌙',title:'Bedroom smart setup',blurb:'Soft light, ambience and color — everything a bedroom upgrade needs.',ids:['3113617','2904850','2782170','1971203']},
+ {icon:'🎮',title:'Gaming setup',blurb:'RGB corner light, TV/monitor backlight and a synced strip for the desk.',ids:['2897066','1640566','2585383']},
+ {icon:'🏡',title:'Home security starter',blurb:'Know when a door opens, water leaks, or someone rings the bell.',ids:['2764085','2892679','2289857','1640712']},
+];
+(function initBundles(){
+  const grid=$('#bundleGrid');
+  if(!grid)return;
+  function render(){
+    grid.innerHTML=BUNDLES.map(b=>{
+      const items=b.ids.map(id=>P.find(x=>x.id===id)).filter(Boolean);
+      const total=items.reduce((s,p)=>s+(isFinite(p.price)?p.price:0),0);
+      const allKnown=items.every(p=>isFinite(p.price));
+      return `<div class="bundle">
+        <div class="bhead"><span class="bicon">${b.icon}</span><div><h3>${b.title}</h3><p class="bblurb">${b.blurb}</p></div></div>
+        <div class="bitems">${items.map(p=>`<div class="bitem"><button data-open="${p.id}">${p.name}</button><span class="bprice">${usd(p.price)}</span></div>`).join('')}</div>
+        <div class="bfoot"><div class="btotal"><span>${items.length} items, combined</span><b>${allKnown?usd(total):'—'}</b></div></div>
+      </div>`;
+    }).join('');
+  }
+  render();
+  syncPricesFor(BUNDLES.flatMap(b=>b.ids)).then(render).catch(()=>{});
 })();
 
 /* ============ CATEGORY TRY-PANELS ============ */
