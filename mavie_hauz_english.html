@@ -1383,11 +1383,20 @@ const navOf=k=>NAV.find(n=>n.k===k);
    o fetch de verdade e responde. Sem esse script colado lá, cai no valor
    inicial do RAW — não quebra, só não sincroniza. */
 const LIVE_KEY='mavieLivePrices_'+CUR; /* cache separado por moeda */
+/* Cache tem prazo de validade: sem isso, um preço buscado uma vez ficava
+   preso em sessionStorage (que sobrevive a F5) até a aba ser fechada —
+   editar o preço na Wix não aparecia no catálogo nem depois de várias
+   atualizações de página. Agora cada entrada expira sozinha. */
+const PRICE_TTL=3*60*1000; /* 3 minutos */
 const livePrices=(()=>{try{return JSON.parse(sessionStorage.getItem(LIVE_KEY)||'{}');}catch(e){return{};}})();
 function saveLivePrices(){try{sessionStorage.setItem(LIVE_KEY,JSON.stringify(livePrices));}catch(e){}}
+function freshCached(id){
+  const c=livePrices[id];
+  return (c&&typeof c==='object'&&(Date.now()-c.t)<PRICE_TTL)?c.v:null;
+}
 /* O preço exibido vem sempre da Wix. Começa vazio e é preenchido pelo
-   cache da sessão (já na moeda ativa) ou pela busca ao vivo. */
-P.forEach(p=>{const c=livePrices[p.id];p.price=(c!=null)?c:null;});
+   cache da sessão (já na moeda ativa, se ainda válido) ou pela busca ao vivo. */
+P.forEach(p=>{const c=freshCached(p.id);p.price=(c!=null)?c:null;});
 let _priceReqSeq=0;
 const _pricePending={};
 window.addEventListener('message',e=>{
@@ -1473,7 +1482,7 @@ const FETCH_CONCURRENCY=4;
 let _syncing=false;
 
 async function syncPricesFor(ids){
-  const pending=ids.filter(id=>WIX_SLUG[id]&&livePrices[id]==null);
+  const pending=ids.filter(id=>WIX_SLUG[id]&&freshCached(id)==null);
   if(!pending.length||_syncing)return;
   _syncing=true;
   let changed=false;
@@ -1484,7 +1493,9 @@ async function syncPricesFor(ids){
       lote.forEach((id,j)=>{
         const price=results[j];
         if(price==null)return;
-        if(livePrices[id]!==price){livePrices[id]=price;changed=true;}
+        const prev=livePrices[id];
+        if(!prev||prev.v!==price){livePrices[id]={v:price,t:Date.now()};changed=true;}
+        else prev.t=Date.now(); /* mesmo valor: só renova o prazo do cache */
         const p=P.find(x=>x.id===id);
         if(p)p.price=price; /* já vem na moeda ativa, convertido pela Wix */
       });
