@@ -521,8 +521,11 @@ body:has(.mvh-root){margin:0}
 .rex-toggle button[aria-pressed="true"]{background:var(--accent);color:#fff}
 @media(max-width:760px){
   .rex-card{width:min(190px,56vw)}
-  .rex-pin .lbl{font-size:10px;padding:3px 7px}
-  .rex-pin .dot{width:24px;height:24px}
+  .rex-pin .dot{width:26px;height:26px}
+  /* No celular não cabe nome sempre visível nos 4 pinos sem embolar —
+     mostra só a bolinha; toca pra ver o nome + o produto juntos. */
+  .rex-pin .lbl{display:none}
+  .rex-pin[aria-expanded="true"] .lbl{display:block;font-size:10.5px;padding:3px 7px}
 }
 </style>
 
@@ -1465,14 +1468,22 @@ function freshCachedImg(id){
   const c=livePrices[id];
   return (c&&typeof c==='object'&&(Date.now()-c.t)<PRICE_TTL&&c.img)?c.img:null;
 }
-/* Foto exibida no card: a real da Wix (og:image), se já buscada e ainda
-   válida; senão a foto de fallback salva no catálogo (IMG, abaixo). Trocar
-   a foto na Wix passa a refletir aqui sozinho, sem precisar editar este
-   arquivo — mesma lógica do preço. */
-function imgFor(id){return freshCachedImg(id)||IMG[id]||null;}
-/* O preço exibido vem sempre da Wix. Começa vazio e é preenchido pelo
-   cache da sessão (já na moeda ativa, se ainda válido) ou pela busca ao vivo. */
-P.forEach(p=>{const c=freshCached(p.id);p.price=(c!=null)?c:null;});
+/* Diferente de freshCached: usado só pra DECIDIR o que mostrar na tela,
+   nunca pra decidir se busca de novo. Mostra o último valor conhecido
+   MESMO EXPIRADO (em vez de "—"/foto antiga por 1-3s toda vez que a
+   página abre) — a busca ao vivo continua rodando por trás e substitui
+   silenciosamente se o valor mudou. Sem isso, todo carregamento de
+   página mostrava um "flash" de preço/foto em branco antes de resolver,
+   mesmo quando já sabíamos o valor de segundos atrás. */
+function lastKnown(id){const c=livePrices[id];return(c&&typeof c==='object')?c.v:null;}
+function lastKnownImg(id){const c=livePrices[id];return(c&&typeof c==='object')?c.img:null;}
+/* Foto exibida no card: a última conhecida da Wix (mesmo que o cache já
+   tenha expirado — uma busca por trás já está a caminho pra confirmar),
+   senão a foto de fallback salva no catálogo (IMG, abaixo). */
+function imgFor(id){return lastKnownImg(id)||IMG[id]||null;}
+/* O preço exibido vem sempre da Wix. Começa com o último valor conhecido
+   desta sessão (se houver) e é confirmado/atualizado pela busca ao vivo. */
+P.forEach(p=>{const c=lastKnown(p.id);p.price=(c!=null)?c:null;});
 let _priceReqSeq=0;
 const _pricePending={};
 window.addEventListener('message',e=>{
