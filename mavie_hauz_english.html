@@ -191,6 +191,9 @@ body:has(.mvh-root){margin:0}
 .roomtemp{position:absolute;right:22px;top:20px;text-align:right;color:#F4F1FA}
 .roomtemp .t{font-family:var(--mono);font-size:19px;font-weight:700}
 .roomtemp .l{font-size:11px;opacity:.66}
+.livehint{position:absolute;left:22px;bottom:14px;font-size:10.5px;font-weight:600;letter-spacing:.02em;color:#F4F1FA;opacity:.7;display:flex;align-items:center;gap:5px}
+.livehint::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:livepulse 2s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
 .scenes{display:flex;gap:8px;padding:15px;border-top:1px solid var(--line);flex-wrap:wrap}
 .scene{padding:8px 15px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line-2);transition:all .16s}
 .scene:hover{background:var(--sunk)}
@@ -305,6 +308,8 @@ body:has(.mvh-root){margin:0}
 .sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
 .readout{display:flex;gap:18px;font-family:var(--mono);font-size:11.5px;color:var(--muted);padding-top:4px;border-top:1px solid var(--line)}
 .readout b{color:var(--ink);font-weight:700;display:block;font-size:14.5px}
+.trycta{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.trycta .link{font-weight:700}
 .bulb{width:118px;height:118px;border-radius:50%;transition:background .45s,box-shadow .45s,opacity .45s}
 .dial{width:162px;height:162px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(from 220deg,#7C3AED 0turn,#C084FC var(--sweep,.4turn),rgba(255,255,255,.09) var(--sweep,.4turn) .78turn,transparent .78turn)}
 .dial::before{content:"";position:absolute;inset:12px;border-radius:50%;background:#12101B}
@@ -698,6 +703,7 @@ body:has(.mvh-root){margin:0}
         <div class="wash" id="wash"></div><div class="cove" id="cove"></div>
         <div class="roomhud"><div class="t" id="clock">--:--</div><div class="g" id="greet">Living room</div></div>
         <div class="roomtemp"><div class="t" id="roomT">21°C</div><div class="l">Living room · 44% RH</div></div>
+        <span class="livehint">● Live preview — tap a scene below</span>
       </div>
       <div class="scenes" id="scenes">
         <button class="scene" data-scene="morning" aria-pressed="false">Morning</button>
@@ -2178,7 +2184,8 @@ const TRY={
    <div class="field"><label>Brightness <span id="brVal">80%</span></label><input type="range" id="br" min="5" max="100" value="80"></div>
    <div class="field"><label>Warmth <span id="wmVal">3200 K</span></label><input type="range" id="wm" min="2000" max="6500" value="3200"></div>
    <div class="field"><label>Color</label><div class="swatches" id="swatches"></div></div>
-   <div class="readout"><span>Output<b id="lm">645 lm</b></span><span>Draw<b id="wtt">6.9 W</b></span><span>CRI<b>95</b></span></div></div></div>`,
+   <div class="readout"><span>Output<b id="lm">645 lm</b></span><span>Draw<b id="wtt">6.9 W</b></span><span>CRI<b>95</b></span></div>
+   <div class="trycta">Like what you see? <button class="link" data-open="2782170">See the real bulb →</button></div></div></div>`,
   init(){
    const SW=[['#FFD9A8','2700 K warm'],['#FFFFFF','5000 K neutral'],['#A78BFA','Violet'],['#F472B6','Pink'],['#22D3EE','Cyan'],['#4ADE80','Mint']];
    $('#swatches').innerHTML=SW.map(([c,l],i)=>`<button class="sw" style="background:${c}" data-c="${c}" title="${l}" aria-label="${l}" aria-pressed="${i===0}"></button>`).join('');
@@ -2202,8 +2209,9 @@ const TRY={
    <div class="tctl"><span class="demotag">Interactive example</span><h3>Security camera · try the controls</h3><p class="lead">Arming runs the entry delay, then reports each sensor as it checks in.</p>
    <div class="togrow"><button class="toggle" id="armBtn" aria-pressed="false" aria-label="Arm system"></button>
      <div><div style="font-weight:700" id="armLabel">Disarmed</div><div class="mono" style="font-size:12px;color:var(--muted)" id="armSub">4 sensors idle</div></div></div>
-   <div class="log" id="log"><div><b>--:--</b> System ready.</div></div>
-   <div class="readout"><span>Resolution<b>2560×1440</b></span><span>Night<b>30 m IR</b></span><span>Storage<b>Local + cloud</b></span></div></div></div>`,
+   <div class="log" id="log"><div><b>Ready</b> Tap Arm to see it work.</div></div>
+   <div class="readout"><span>Resolution<b>2560×1440</b></span><span>Night<b>30 m IR</b></span><span>Storage<b>Local + cloud</b></span></div>
+   <div class="trycta">Like what you see? <button class="link" data-open="2289857">See the real camera →</button></div></div></div>`,
   init(){
    const S=['Front door','Patio slider','Garage','Motion · hall'];let armed=false,t;
    const stamp=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
@@ -2221,7 +2229,8 @@ const TRY={
    <div class="steppers"><button class="step" id="down" aria-label="Lower target">−</button><button class="step" id="up" aria-label="Raise target">+</button></div>
    <div class="saveline" id="saveLine">≈ 6% lower heating spend · about $11 a year.</div>
    <div class="field"><label>Eco schedule <span id="ecoVal">6 h / night</span></label><input type="range" id="eco" min="0" max="12" value="6"></div>
-   <div class="readout"><span>Remote sensors<b>4</b></span><span>Payback<b>~14 mo</b></span><span>Compatible<b>Most HVAC</b></span></div></div></div>`,
+   <div class="readout"><span>Remote sensors<b>4</b></span><span>Payback<b>~14 mo</b></span><span>Compatible<b>Most HVAC</b></span></div>
+   <div class="trycta">Like what you see? <button class="link" data-open="2778957">See the real thermostat →</button></div></div></div>`,
   init(){
    let temp=21,eco=6;
    const paint=()=>{$('#tempV').textContent=temp;
@@ -2242,7 +2251,8 @@ const TRY={
    <div class="togrow"><button class="toggle" id="plugBtn" aria-pressed="false" aria-label="Toggle outlet"></button>
      <div><div style="font-weight:700" id="plugLabel">Outlet off</div><div class="mono" style="font-size:12px;color:var(--muted)" id="plugSub">Standby 0.4 W</div></div></div>
    <div class="field"><label>Appliance</label><div class="swatches" id="appliances" style="gap:7px"></div></div>
-   <div class="readout"><span>Max load<b>16 A</b></span><span>Protocol<b>Matter / Thread</b></span><span>Works offline<b>Yes</b></span></div></div></div>`,
+   <div class="readout"><span>Max load<b>16 A</b></span><span>Protocol<b>Matter / Thread</b></span><span>Works offline<b>Yes</b></span></div>
+   <div class="trycta">Like what you see? <button class="link" data-open="2295971">See the real power strip →</button></div></div></div>`,
   init(){
    const A=[['Kettle',1800],['Desk setup',210],['Heater',1200],['Fridge',95],['Lamp',9]];
    $('#appliances').innerHTML=A.map(([n,w],i)=>`<button class="sw" style="width:auto;height:auto;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;background:var(--sunk);box-shadow:inset 0 0 0 1px var(--line-2)" data-w="${w}" aria-pressed="${i===0}">${n}</button>`).join('');
