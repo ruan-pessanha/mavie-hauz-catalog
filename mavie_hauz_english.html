@@ -486,8 +486,10 @@ body:has(.mvh-root){margin:0}
 .rex .head .eyebrow{font-family:var(--mono,inherit);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;display:block;margin-bottom:8px}
 .rex .head h2{font-size:clamp(22px,3vw,30px);margin:0 0 8px}
 .rex .head p{color:var(--ink-2);margin:0;font-size:14.5px}
-.rex-stage{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.3),0 24px 60px -24px rgba(0,0,0,.6);aspect-ratio:16/9;background:#0b0b10}
+.rex-stage{position:relative;border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.3),0 24px 60px -24px rgba(0,0,0,.6);aspect-ratio:16/9;background:#0b0b10}
+.rex-media{position:absolute;inset:0;border-radius:18px;overflow:hidden}
 .rex-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s ease}
+#rexPins{position:absolute;inset:0}
 .rex-stage img.rex-off{opacity:1}
 .rex-stage img.rex-on{opacity:0}
 .rex-stage.on img.rex-off{opacity:0}
@@ -498,8 +500,12 @@ body:has(.mvh-root){margin:0}
 .rex-pin:hover .dot,.rex-pin[aria-expanded="true"] .dot{transform:scale(1.12);border-color:var(--accent)}
 .rex-pin .lbl{font-size:11.5px;font-weight:700;color:#fff;background:rgba(15,13,22,.72);backdrop-filter:blur(3px);padding:3px 9px;border-radius:999px;white-space:nowrap;pointer-events:none;transition:transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .rex-pin:hover .lbl,.rex-pin[aria-expanded="true"] .lbl{transform:translateY(-2px)}
-.rex-card{position:absolute;transform:translate(-50%,10px);top:100%;left:50%;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.15),0 16px 40px -16px rgba(0,0,0,.5);padding:12px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.rex-card{position:absolute;top:100%;left:50%;transform:translate(-50%,10px);width:min(230px,58vw);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.15),0 16px 40px -16px rgba(0,0,0,.5);padding:12px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
 .rex-pin[aria-expanded="true"] .rex-card{opacity:1;pointer-events:auto;transform:translate(-50%,4px)}
+.rex-pin.edge-r .rex-card{left:auto;right:-6px;transform:translate(0,10px)}
+.rex-pin.edge-r[aria-expanded="true"] .rex-card{transform:translate(0,4px)}
+.rex-pin.edge-l .rex-card{left:-6px;transform:translate(0,10px)}
+.rex-pin.edge-l[aria-expanded="true"] .rex-card{transform:translate(0,4px)}
 .rex-card .k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .rex-card .n{font-size:13px;font-weight:700;color:var(--ink);margin:3px 0 8px;line-height:1.3}
 .rex-card .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -671,8 +677,10 @@ body:has(.mvh-root){margin:0}
       <p>Toggle the lights and tap a device to see the real product behind it.</p>
     </div>
     <div class="rex-stage" id="rexStage">
-      <img class="rex-off" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-off.jpg" alt="Living room, lights off">
-      <img class="rex-on" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-on.jpg" alt="Living room, smart lighting on">
+      <div class="rex-media">
+        <img class="rex-off" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-off.jpg" alt="Living room, lights off">
+        <img class="rex-on" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-on.jpg" alt="Living room, smart lighting on">
+      </div>
       <div id="rexPins"></div>
     </div>
     <div class="rex-toolbar">
@@ -2017,7 +2025,8 @@ const REX_PINS=[
     const p=P.find(x=>x.id===pin.id);
     if(!p)return '';
     const href=WIX_MODE?(STORE_URL+'/product-page/'+(WIX_SLUG[pin.id]||pin.id)):'#';
-    return `<button class="rex-pin" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="false" aria-label="${pin.label}">
+    const edge=pin.x>66?'edge-r':pin.x<22?'edge-l':'';
+    return `<button class="rex-pin ${edge}" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="false" aria-label="${pin.label}">
       <span class="dot"></span><span class="lbl">${pin.label}</span>
       <span class="rex-card" role="dialog">
         <span class="k">${pin.label}</span>
