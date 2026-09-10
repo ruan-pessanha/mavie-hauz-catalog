@@ -479,6 +479,38 @@ body:has(.mvh-root){margin:0}
   .iconbtn svg{width:17px;height:17px}
 }
 @media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
+
+/* ============ ROOM EXPLORER ============ */
+.rex{padding:56px 0 8px}
+.rex .head{text-align:center;max-width:60ch;margin:0 auto 22px}
+.rex .head .eyebrow{font-family:var(--mono,inherit);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;display:block;margin-bottom:8px}
+.rex .head h2{font-size:clamp(22px,3vw,30px);margin:0 0 8px}
+.rex .head p{color:var(--ink-2);margin:0;font-size:14.5px}
+.rex-stage{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.3),0 24px 60px -24px rgba(0,0,0,.6);aspect-ratio:16/9;background:#0b0b10}
+.rex-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s ease}
+.rex-stage img.rex-off{opacity:1}
+.rex-stage img.rex-on{opacity:0}
+.rex-stage.on img.rex-off{opacity:0}
+.rex-stage.on img.rex-on{opacity:1}
+.rex-pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:0;padding:0}
+.rex-pin .dot{width:30px;height:30px;border-radius:50%;background:rgba(15,13,22,.55);backdrop-filter:blur(3px);border:1.5px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.35);transition:transform .15s,border-color .15s}
+.rex-pin .dot::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff}
+.rex-pin:hover .dot,.rex-pin[aria-expanded="true"] .dot{transform:scale(1.12);border-color:var(--accent)}
+.rex-pin .lbl{font-size:11.5px;font-weight:700;color:#fff;background:rgba(15,13,22,.7);padding:3px 9px;border-radius:999px;white-space:nowrap;opacity:0;transform:translateY(-4px);transition:opacity .15s,transform .15s;pointer-events:none}
+.rex-pin:hover .lbl,.rex-pin[aria-expanded="true"] .lbl{opacity:1;transform:translateY(0)}
+.rex-card{position:absolute;transform:translate(-50%,10px);top:100%;left:50%;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.15),0 16px 40px -16px rgba(0,0,0,.5);padding:12px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s}
+.rex-pin[aria-expanded="true"] .rex-card{opacity:1;pointer-events:auto;transform:translate(-50%,4px)}
+.rex-card .k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.rex-card .n{font-size:13px;font-weight:700;color:var(--ink);margin:3px 0 8px;line-height:1.3}
+.rex-card .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rex-card .p{font-family:var(--mono,inherit);font-weight:700;color:var(--ink)}
+.rex-card a.btn{font-size:12px;padding:7px 11px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;white-space:nowrap}
+.rex-toolbar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px}
+.rex-toolbar span{font-family:var(--mono,inherit);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rex-toggle{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+.rex-toggle button{font:inherit;font-size:12.5px;font-weight:700;padding:8px 16px;border:0;background:var(--surface);color:var(--ink-2);cursor:pointer}
+.rex-toggle button[aria-pressed="true"]{background:var(--accent);color:#fff}
+@media(max-width:760px){.rex-card{width:190px}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -631,6 +663,26 @@ body:has(.mvh-root){margin:0}
       <div class="devrow" id="devrow"></div>
     </div>
   </div></div>
+
+  <section class="rex"><div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Try it yourself</span>
+      <h2>See it in your living room.</h2>
+      <p>Toggle the lights and tap a device to see the real product behind it.</p>
+    </div>
+    <div class="rex-stage" id="rexStage">
+      <img class="rex-off" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-off.jpg" alt="Living room, lights off">
+      <img class="rex-on" src="https://cdn.jsdelivr.net/gh/ruan-pessanha/mavie-hauz-catalog@main/assets/room-on.jpg" alt="Living room, smart lighting on">
+      <div id="rexPins"></div>
+    </div>
+    <div class="rex-toolbar">
+      <span>Room lights</span>
+      <div class="rex-toggle" id="rexToggle">
+        <button data-on="0" aria-pressed="true">Off</button>
+        <button data-on="1" aria-pressed="false">On</button>
+      </div>
+    </div>
+  </div></section>
 
   <section class="quizband"><div class="wrap">
     <div class="quizcard" id="quizCard">
@@ -1947,6 +1999,50 @@ function tick(){const d=new Date(),h=d.getHours();
   $('#clock').textContent=String(h).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
   $('#greet').textContent=h<5?'Everything is quiet':h<12?'Good morning':h<18?'Good afternoon':'Good evening';}
 tick();setInterval(tick,10000);applyScene(new Date().getHours()<12?'morning':'evening');
+
+/* ============ ROOM EXPLORER ============
+   Foto real (par apagada/acesa) com pontos clicáveis apontando pra produtos
+   de verdade do catálogo — cada pino abre um mini-card com nome, preço e
+   link direto pra página do produto na Wix. */
+const REX_PINS=[
+ {x:11,y:70,label:'Floor lamp',id:'2897066'},
+ {x:81,y:36,label:'TV backlight',id:'2585383'},
+ {x:84,y:73,label:'Smart plug',id:'2295971'},
+ {x:87,y:80,label:'Security camera',id:'2289857'},
+ {x:47,y:39,label:'Smart curtains',id:'2015190'}
+];
+(function initRoomExplorer(){
+  const stage=$('#rexStage'),pinsEl=$('#rexPins');
+  if(!stage||!pinsEl)return;
+  pinsEl.innerHTML=REX_PINS.map((pin,i)=>{
+    const p=P.find(x=>x.id===pin.id);
+    if(!p)return '';
+    const href=WIX_MODE?(STORE_URL+'/product-page/'+(WIX_SLUG[pin.id]||pin.id)):'#';
+    return `<button class="rex-pin" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="false" aria-label="${pin.label}">
+      <span class="dot"></span><span class="lbl">${pin.label}</span>
+      <span class="rex-card" role="dialog">
+        <span class="k">${pin.label}</span>
+        <div class="n">${p.name}</div>
+        <div class="row"><span class="p">${usd(p.price)}</span><a class="btn" href="${href}" target="${WIX_MODE?'_top':'_self'}" onclick="event.stopPropagation()">View product</a></div>
+      </span>
+    </button>`;
+  }).join('');
+  pinsEl.addEventListener('click',e=>{
+    const pin=e.target.closest('.rex-pin');
+    $$('.rex-pin',pinsEl).forEach(b=>{if(b!==pin)b.setAttribute('aria-expanded','false');});
+    if(!pin)return;
+    const open=pin.getAttribute('aria-expanded')==='true';
+    pin.setAttribute('aria-expanded',String(!open));
+  });
+  document.addEventListener('click',e=>{if(!pinsEl.contains(e.target))$$('.rex-pin',pinsEl).forEach(b=>b.setAttribute('aria-expanded','false'));});
+  const tg=$('#rexToggle');
+  if(tg)tg.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const on=b.dataset.on==='1';
+    stage.classList.toggle('on',on);
+    $$('button',tg).forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  });
+})();
 
 /* ============ CATEGORY TRY-PANELS ============ */
 let timers=[];
