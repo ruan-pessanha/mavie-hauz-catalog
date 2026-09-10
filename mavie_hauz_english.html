@@ -495,6 +495,9 @@ body:has(.mvh-root){margin:0}
 .rex-stage.on img.rex-off{opacity:0}
 .rex-stage.on img.rex-on{opacity:1}
 .rex-pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;background:none;border:0;padding:0}
+.rex-pin.edge-r{align-items:flex-end}
+.rex-pin.edge-l{align-items:flex-start}
+.rex-pin.lbl-up{flex-direction:column-reverse}
 .rex-pin .dot{width:30px;height:30px;border-radius:50%;background:rgba(15,13,22,.55);backdrop-filter:blur(3px);border:1.5px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.35);transition:transform .15s,border-color .15s}
 .rex-pin .dot::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff}
 .rex-pin:hover .dot,.rex-pin[aria-expanded="true"] .dot{transform:scale(1.12);border-color:var(--accent)}
@@ -516,7 +519,11 @@ body:has(.mvh-root){margin:0}
 .rex-toggle{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
 .rex-toggle button{font:inherit;font-size:12.5px;font-weight:700;padding:8px 16px;border:0;background:var(--surface);color:var(--ink-2);cursor:pointer}
 .rex-toggle button[aria-pressed="true"]{background:var(--accent);color:#fff}
-@media(max-width:760px){.rex-card{width:190px}}
+@media(max-width:760px){
+  .rex-card{width:min(190px,56vw)}
+  .rex-pin .lbl{font-size:10px;padding:3px 7px}
+  .rex-pin .dot{width:24px;height:24px}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -2016,7 +2023,7 @@ const REX_PINS=[
  {x:7.5,y:45,label:'Floor lamp',id:'2897066'},
  {x:81,y:43,label:'TV backlight',id:'2585383'},
  {x:79,y:72,label:'Smart plug',id:'2295971'},
- {x:62,y:39,label:'Smart curtains',id:'2015190'}
+ {x:62,y:39,label:'Smart curtains',id:'2015190',dir:'up'}
 ];
 (function initRoomExplorer(){
   const stage=$('#rexStage'),pinsEl=$('#rexPins');
@@ -2028,7 +2035,8 @@ const REX_PINS=[
       if(!p)return '';
       const href=WIX_MODE?(STORE_URL+'/product-page/'+(WIX_SLUG[pin.id]||pin.id)):'#';
       const edge=pin.x>66?'edge-r':pin.x<22?'edge-l':'';
-      return `<button class="rex-pin ${edge}" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="${i===openIdx}" aria-label="${pin.label}">
+      const dir=pin.dir==='up'?'lbl-up':'';
+      return `<button class="rex-pin ${edge} ${dir}" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="${i===openIdx}" aria-label="${pin.label}">
         <span class="dot"></span><span class="lbl">${pin.label}</span>
         <span class="rex-card" role="dialog">
           <span class="k">${pin.label}</span>
