@@ -2121,8 +2121,9 @@ const BUNDLES=[
   function render(){
     grid.innerHTML=BUNDLES.map(b=>{
       const items=b.ids.map(id=>P.find(x=>x.id===id)).filter(Boolean);
-      const total=items.reduce((s,p)=>s+(isFinite(p.price)?p.price:0),0);
-      const allKnown=items.every(p=>isFinite(p.price));
+      const hasPrice=p=>p.price!=null&&isFinite(p.price);
+      const total=items.reduce((s,p)=>s+(hasPrice(p)?p.price:0),0);
+      const allKnown=items.every(hasPrice);
       return `<div class="bundle">
         <div class="bhead"><span class="bicon">${b.icon}</span><div><h3>${b.title}</h3><p class="bblurb">${b.blurb}</p></div></div>
         <div class="bitems">${items.map(p=>`<div class="bitem"><button data-open="${p.id}">${p.name}</button><span class="bprice">${usd(p.price)}</span></div>`).join('')}</div>
