@@ -2021,20 +2021,27 @@ const REX_PINS=[
 (function initRoomExplorer(){
   const stage=$('#rexStage'),pinsEl=$('#rexPins');
   if(!stage||!pinsEl)return;
-  pinsEl.innerHTML=REX_PINS.map((pin,i)=>{
-    const p=P.find(x=>x.id===pin.id);
-    if(!p)return '';
-    const href=WIX_MODE?(STORE_URL+'/product-page/'+(WIX_SLUG[pin.id]||pin.id)):'#';
-    const edge=pin.x>66?'edge-r':pin.x<22?'edge-l':'';
-    return `<button class="rex-pin ${edge}" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="false" aria-label="${pin.label}">
-      <span class="dot"></span><span class="lbl">${pin.label}</span>
-      <span class="rex-card" role="dialog">
-        <span class="k">${pin.label}</span>
-        <div class="n">${p.name}</div>
-        <div class="row"><span class="p">${usd(p.price)}</span><a class="btn" href="${href}" target="${WIX_MODE?'_top':'_self'}" onclick="event.stopPropagation()">View product</a></div>
-      </span>
-    </button>`;
-  }).join('');
+  function renderPins(){
+    const openIdx=$$('.rex-pin',pinsEl).findIndex(b=>b.getAttribute('aria-expanded')==='true');
+    pinsEl.innerHTML=REX_PINS.map((pin,i)=>{
+      const p=P.find(x=>x.id===pin.id);
+      if(!p)return '';
+      const href=WIX_MODE?(STORE_URL+'/product-page/'+(WIX_SLUG[pin.id]||pin.id)):'#';
+      const edge=pin.x>66?'edge-r':pin.x<22?'edge-l':'';
+      return `<button class="rex-pin ${edge}" style="left:${pin.x}%;top:${pin.y}%" data-i="${i}" aria-expanded="${i===openIdx}" aria-label="${pin.label}">
+        <span class="dot"></span><span class="lbl">${pin.label}</span>
+        <span class="rex-card" role="dialog">
+          <span class="k">${pin.label}</span>
+          <div class="n">${p.name}</div>
+          <div class="row"><span class="p">${usd(p.price)}</span><a class="btn" href="${href}" target="${WIX_MODE?'_top':'_self'}" onclick="event.stopPropagation()">View product</a></div>
+        </span>
+      </button>`;
+    }).join('');
+  }
+  renderPins();
+  /* Produtos dos pinos não aparecem em nenhuma grade normal, então nunca
+     entram no visibleIds() que busca preço ao vivo — pede aqui na mão. */
+  syncPricesFor(REX_PINS.map(p=>p.id)).then(renderPins).catch(()=>{});
   pinsEl.addEventListener('click',e=>{
     const pin=e.target.closest('.rex-pin');
     $$('.rex-pin',pinsEl).forEach(b=>{if(b!==pin)b.setAttribute('aria-expanded','false');});
