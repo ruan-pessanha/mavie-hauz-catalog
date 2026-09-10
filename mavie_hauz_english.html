@@ -480,6 +480,18 @@ body:has(.mvh-root){margin:0}
 }
 @media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
 
+/* ============ LIFESTYLE BLOCKS ============ */
+.lifeband{padding:52px 0 0}
+.lifehead{text-align:center;max-width:56ch;margin:0 auto 22px}
+.lifehead h2{font-size:clamp(22px,3vw,28px);margin:0 0 6px}
+.lifehead p{color:var(--muted);margin:0;font-size:14.5px}
+.lifegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.lifecard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 18px;text-align:left;cursor:pointer;transition:transform .15s,border-color .15s;font:inherit;color:inherit}
+.lifecard:hover{transform:translateY(-2px);border-color:var(--accent)}
+.lifecard .lemoji{font-size:26px;display:block;margin-bottom:10px}
+.lifecard h3{font-size:15px;margin:0 0 4px}
+.lifecard p{font-size:12.5px;color:var(--muted);margin:0}
+
 /* ============ ROOM EXPLORER ============ */
 .rex{padding:56px 0 8px}
 .rex .head{text-align:center;max-width:60ch;margin:0 auto 22px}
@@ -696,6 +708,14 @@ body:has(.mvh-root){margin:0}
       <div class="devrow" id="devrow"></div>
     </div>
   </div></div>
+
+  <section class="lifeband"><div class="wrap">
+    <div class="lifehead">
+      <h2>Make your home feel smarter.</h2>
+      <p>Simple upgrades for better lighting, security, comfort and everyday living.</p>
+    </div>
+    <div class="lifegrid" id="lifeGrid"></div>
+  </div></section>
 
   <section class="rex"><div class="wrap">
     <div class="head">
@@ -2047,6 +2067,20 @@ function tick(){const d=new Date(),h=d.getHours();
   $('#clock').textContent=String(h).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
   $('#greet').textContent=h<5?'Everything is quiet':h<12?'Good morning':h<18?'Good afternoon':'Good evening';}
 tick();setInterval(tick,10000);applyScene(new Date().getHours()<12?'morning':'evening');
+
+/* ============ LIFESTYLE BLOCKS ============ */
+const LIFE_BLOCKS=[
+ {emoji:'💡',title:'Light differently',blurb:'Bulbs, strips and lamps that set the mood.',nav:'indoor'},
+ {emoji:'🔒',title:'Feel safer',blurb:'Cameras, locks and sensors that watch what matters.',nav:'security'},
+ {emoji:'🌡️',title:'Stay comfortable',blurb:'Thermostats, air and blinds that adjust for you.',nav:'climate'},
+ {emoji:'🏠',title:'Automate everyday life',blurb:'Plugs, switches and hubs that tie it together.',nav:'connect'},
+];
+(function initLifeBlocks(){
+  const grid=$('#lifeGrid');
+  if(!grid)return;
+  grid.innerHTML=LIFE_BLOCKS.map(b=>`<button class="lifecard" data-nav="${b.nav}">
+    <span class="lemoji">${b.emoji}</span><h3>${b.title}</h3><p>${b.blurb}</p></button>`).join('');
+})();
 
 /* ============ ROOM EXPLORER ============
    Foto real (par apagada/acesa) com pontos clicáveis apontando pra produtos
