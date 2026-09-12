@@ -2001,7 +2001,7 @@ if(WIX_MODE){
    Moeda: a loja Wix converte de verdade via ?currency=XXX (testado) — o menu
    só navega, quem converte é a Wix, inclusive no checkout.
    Conta: leva às páginas de membro reais da loja. */
-const CURRENCIES=[['USD','$'],['EUR','€'],['GBP','£'],['BRL','R$'],['CAD','C$'],['AUD','AU$'],['MXN','$'],['JPY','¥']];
+const CURRENCIES=[['USD','$'],['EUR','€'],['GBP','£'],['BRL','R$'],['CAD','C$'],['AUD','AU$'],['MXN','$'],['JPY','¥'],['CHF','Fr'],['SGD','S$'],['HKD','HK$'],['NZD','NZ$'],['KRW','₩'],['INR','₹'],['SEK','kr'],['NOK','kr'],['DKK','kr'],['AED','د.إ'],['TRY','₺'],['ILS','₪'],['ZAR','R'],['ARS','$'],['CLP','$'],['COP','$'],['CNY','¥']];
 const ACCOUNT_LINKS=[['My Orders','/my-orders'],['My Wishlist','/my-wishlist'],['Account Settings','/account-settings']];
 
 function curSymbol(code){const f=CURRENCIES.find(c=>c[0]===code);return f?f[1]:'';}
