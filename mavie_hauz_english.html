@@ -1290,7 +1290,7 @@ const CUR=(()=>{try{const c=new URLSearchParams(location.search).get('currency')
    pode estar defasado em relação ao da loja. */
 const usd=n=>{
   if(n==null||!isFinite(n))return '—';
-  try{return new Intl.NumberFormat(undefined,{style:'currency',currency:CUR}).format(n);}
+  try{return new Intl.NumberFormat('en-US',{style:'currency',currency:CUR}).format(n);}
   catch(e){return '$'+Number(n).toFixed(2);}};
 /* abre a loja real numa aba nova — mais confiável que navegar a aba atual */
 const goWix=path=>{
