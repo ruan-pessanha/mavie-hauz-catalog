@@ -782,6 +782,12 @@ body:has(.mvh-root){margin:0}
   </section></div>
 
   <div class="wrap"><section style="padding-top:16px">
+    <div class="sechead"><div><h2>Works with Alexa &amp; Google</h2><p>Already have a voice assistant? These devices pair with it — say the word and the lights, plugs and locks respond.</p></div>
+      <button class="link" data-view="voice">See all compatible devices →</button></div>
+    <div class="grid" id="gridVoice"></div>
+  </section></div>
+
+  <div class="wrap"><section style="padding-top:16px">
     <div class="sechead"><div><h2>Featured products</h2><p>Smart upgrades worth discovering.</p></div>
       <button class="link" data-nav="indoor">Browse all products →</button></div>
     <div class="grid" id="gridHome"></div>
@@ -1584,6 +1590,8 @@ const RAW=[
 const P=RAW.map(r=>({id:r[0],nav:r[1],sub:r[2],ic:r[3],brand:r[4],name:r[5],price:r[6],usdPrice:r[6],was:r[7]||null,
   flag:r[8]||null,rate:r[9],rev:r[10],d:r[11],sp:r[12],rooms:r[13]}))
   .filter(p=>!WIX_MODE||WIX_SLUG[p.id]);
+const VOICE_IDS=['1914164','2895495','1640405','3147046','3085373','2295086','2294537','2295971','2290338','2283208','2279423','2310832','3165754','2924537','2289857'];
+const byVoice=()=>P.filter(p=>VOICE_IDS.includes(p.id));
 const bySub=k=>P.filter(p=>p.sub===k);
 const byNav=k=>P.filter(p=>p.nav===k);
 const subOf=k=>NAV.flatMap(n=>n.subs).find(s=>s.k===k);
@@ -1772,7 +1780,7 @@ function visibleIds(){
 function syncVisiblePrices(){syncPricesFor(visibleIds());}
 function refreshVisibleGrids(){
   const vHome=$('#v-home'),vCat=$('#v-cat');
-  if(vHome&&!vHome.hidden){const h=$('#gridHome');if(h)fill(h,P.filter(p=>p.flag==='HOT').slice(0,8));}
+  if(vHome&&!vHome.hidden){const h=$('#gridHome');if(h)fill(h,P.filter(p=>p.flag==='HOT').slice(0,8));const gv=$('#gridVoice');if(gv)fill(gv,byVoice().slice(0,8));}
   if(vCat&&!vCat.hidden)renderCat();
 }
 
@@ -1795,12 +1803,14 @@ const fill=(el,list)=>{
 /* ============ NAV + MEGA MENU ============ */
 $('#nav').innerHTML=NAV.map(n=>`<button class="navb" data-nav="${n.k}" aria-expanded="false">${n.n}</button>`).join('')
  +`<button class="navb" data-view="rooms">Shop by Room</button>`
+ +`<button class="navb" data-view="voice">Alexa &amp; Google</button>`
  +`<button class="navb deal" data-view="deals">Deals</button>`
  +`<button class="navb" data-view="support">Support</button>`;
 
 /* mesma lista, versão gaveta mobile (fora de #nav, então clique abre a categoria direto) */
 $('#mdlist').innerHTML=NAV.map(n=>`<button class="mdbtn" data-nav="${n.k}">${n.n}</button>`).join('')
  +`<button class="mdbtn" data-view="rooms">Shop by Room</button>`
+ +`<button class="mdbtn" data-view="voice">Works with Alexa &amp; Google</button>`
  +`<button class="mdbtn deal" data-view="deals">Deals</button>`
  +`<button class="mdbtn" data-view="support">Support</button>`;
 const openDrawer=o=>{$('#mobiledrawer').hidden=!o;$('#mobilescrim').hidden=!o;};
@@ -1875,8 +1885,8 @@ function openCat(navK,subK='all',opts={}){
   }else if(cur.mode==='room'){
     side.innerHTML=ROOMS.map(r=>`<button data-room="${r.k}" aria-pressed="${cur.room===r.k}">${r.n}<span class="n">${P.filter(p=>p.rooms.includes(r.k)).length}</span></button>`).join('');
   }else side.innerHTML='';
-  $('#sideList').parentElement.hidden=cur.mode==='deals';
-  $('#shopGrid').classList.toggle('noside',cur.mode==='deals');
+  $('#sideList').parentElement.hidden=cur.mode==='deals'||cur.mode==='voice';
+  $('#shopGrid').classList.toggle('noside',cur.mode==='deals'||cur.mode==='voice');
   /* try panel */
   $('#tryslot').innerHTML='';
   if(cur.mode==='nav'&&TRY[navK]){$('#tryslot').innerHTML=TRY[navK].html;TRY[navK].init();}
@@ -1885,6 +1895,7 @@ function openCat(navK,subK='all',opts={}){
 function pool(){
   if(cur.mode==='room')return P.filter(p=>p.rooms.includes(cur.room));
   if(cur.mode==='deals')return P.filter(p=>p.was);
+  if(cur.mode==='voice')return byVoice();
   return cur.sub==='all'?byNav(cur.nav):bySub(cur.sub);
 }
 function buildToolbar(){
@@ -1961,6 +1972,8 @@ document.addEventListener('click',e=>{
     if(v.dataset.view==='rooms'){
       if(MULTI_PAGE&&PAGE_VIEW!=='home'){goPage(PAGE_URL.home+'?view=rooms');return;}
       openCat(null,'all',{mode:'room',room:'living',eyebrow:'Shop by room',title:'Living Room',blurb:"Everything we'd put in a living room."});
+    }else if(v.dataset.view==='voice'){
+      openCat(null,'all',{mode:'voice',eyebrow:'Voice control',title:'Works with Alexa & Google',blurb:`${byVoice().length} devices you can control by voice with Alexa or Google Assistant.`});
     }else if(v.dataset.view==='deals'){
       if(MULTI_PAGE){goPage(PAGE_URL.deals);return;}
       openCat(null,'all',{mode:'deals',eyebrow:'Deals',title:'On sale now',blurb:`${P.filter(p=>p.was).length} products currently discounted.`});
@@ -1999,6 +2012,7 @@ $('#roomsGrid').innerHTML=ROOMS.map(r=>`<button class="room" data-roomgo="${r.k}
   <h3>${r.n}</h3><p class="rblurb">${r.blurb}</p>
   <span>${P.filter(p=>p.rooms.includes(r.k)).length} products →</span></button>`).join('');
 fill($('#gridHome'),P.filter(p=>p.flag==='HOT').slice(0,8));
+fill($('#gridVoice'),byVoice().slice(0,8));
 syncVisiblePrices();
 $('#footGrid').innerHTML=`<div><div class="brand" style="margin-bottom:12px">
     <svg viewBox="0 0 64 44" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 40 26 8l14 20"/><path d="M26 40V22"/><path d="M32 40 46 20l14 20"/><path d="M40 40V29h12v11"/></svg>Mavie Hauz</div>
