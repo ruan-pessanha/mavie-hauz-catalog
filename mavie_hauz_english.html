@@ -1326,6 +1326,8 @@ const IMG={
    do que está aqui (confira na barra de endereço ao publicar).
    ══════════════════════════════════════════════════════════════ */
 const MULTI_PAGE=false;
+/* políticas: páginas da Wix (uma versão só, a mesma do rodapé das outras páginas) */
+const POLICY_URL={shipping:'https://www.maviehauz.com/shipping-policy',returns:'https://www.maviehauz.com/refund-policy',terms:'https://www.maviehauz.com/terms-of-service',privacy:'https://www.maviehauz.com/privacy-policy'};
 const PAGE_VIEW='home';
 const PAGE_URL={
   home:'/store', indoor:'/indoor-lights', outdoor:'/outdoor-lights', security:'/security',
@@ -1978,6 +1980,7 @@ document.addEventListener('click',e=>{
       if(MULTI_PAGE){goPage(PAGE_URL.deals);return;}
       openCat(null,'all',{mode:'deals',eyebrow:'Deals',title:'On sale now',blurb:`${P.filter(p=>p.was).length} products currently discounted.`});
     }else if(v.dataset.view==='support'&&MULTI_PAGE){goPage(PAGE_URL.support);}
+    else if(POLICY_URL[v.dataset.view]){location.href=POLICY_URL[v.dataset.view];}
     else view(v.dataset.view);
   }
 });
@@ -2020,7 +2023,7 @@ $('#footGrid').innerHTML=`<div><div class="brand" style="margin-bottom:12px">
  +NAV.slice(0,2).map(n=>`<div><h4>${n.n}</h4>${n.subs.slice(0,5).map(s=>`<button data-sub="${s.k}" data-foot>${s.n}</button>`).join('')}</div>`).join('')
  +`<div><h4>Help</h4><button data-view="support">FAQ</button><button data-view="deals">Deals</button><button data-view="rooms">Shop by room</button></div>`
  +`<div><h4>Company</h4><button data-view="about">About Us</button><button data-view="contact">Contact</button></div>`
- +`<div><h4>Policies</h4><button data-view="shipping">Shipping Policy</button><button data-view="returns">Return Policy</button><button data-view="terms">Terms of Service</button><button data-view="privacy">Privacy Policy</button></div>`;
+ +`<div><h4>Policies</h4><button data-view="shipping">Shipping Policy</button><button data-view="returns">Refund Policy</button><button data-view="terms">Terms of Service</button><button data-view="privacy">Privacy Policy</button></div>`;
 $('#footGrid').addEventListener('click',e=>{const b=e.target.closest('[data-foot]');if(!b)return;
   const s=subOf(b.dataset.sub),parentK=NAV.find(n=>n.subs.includes(s)).k;
   if(MULTI_PAGE){goPage(PAGE_URL[parentK]);return;}
