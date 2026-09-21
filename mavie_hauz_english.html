@@ -1562,8 +1562,8 @@ const RAW=[
 const P=RAW.map(r=>({id:r[0],nav:r[1],sub:r[2],ic:r[3],brand:r[4],name:r[5],price:r[6],usdPrice:r[6],was:r[7]||null,
   flag:r[8]||null,rate:r[9],rev:r[10],d:r[11],sp:r[12],rooms:r[13]}))
   .filter(p=>!WIX_MODE||WIX_SLUG[p.id]);
-const VOICE_IDS=['1914164','2895495','1640405','3147046','3085373','2295086','2294537','2295971','2290338','2283208','2279423','2310832','3165754','2924537','2289857'];
-const byVoice=()=>P.filter(p=>VOICE_IDS.includes(p.id));
+const VOICE_IDS=['3085373','3165754','2289857','1914164','1640405','3147046','2924537','2895495','2295086','2294537','2295971','2290338','2283208','2279423','2310832'];
+const byVoice=()=>VOICE_IDS.map(id=>P.find(p=>p.id===id)).filter(Boolean);
 const bySub=k=>P.filter(p=>p.sub===k);
 const byNav=k=>P.filter(p=>p.nav===k);
 const subOf=k=>NAV.flatMap(n=>n.subs).find(s=>s.k===k);
