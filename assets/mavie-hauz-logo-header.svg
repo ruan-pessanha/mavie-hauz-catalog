@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" width="300" height="64">
+  <defs>
+    <linearGradient id="mhGrad" x1="0" y1="0" x2="64" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C4B5FD"/>
+      <stop offset="0.55" stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#5B21B6"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(2,10)" fill="none" stroke="url(#mhGrad)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 40 26 8l14 20"/>
+    <path d="M26 40V22"/>
+    <path d="M32 40 46 20l14 20"/>
+    <path d="M40 40V29h12v11"/>
+  </g>
+  <text x="70" y="42" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="29" letter-spacing="0.2" fill="#FFFFFF">Mavie Hauz</text>
+</svg>
