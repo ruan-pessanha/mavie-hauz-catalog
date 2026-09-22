@@ -491,6 +491,18 @@ body:has(.mvh-root){margin:0}
 }
 @media(prefers-reduced-motion:reduce){.mvh-root,.mvh-root *{animation:none!important;transition:none!important}}
 
+/* ============ GUIDE BANNER ============ */
+.guideband{padding:28px 0 0}
+.guidecard{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:var(--r);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));text-decoration:none;color:inherit;transition:border-color .18s,transform .18s}
+.guidecard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.guideicon{flex:none;width:40px;height:40px;border-radius:10px;background:var(--surface);display:grid;place-items:center;color:var(--accent)}
+.guideicon svg{width:20px;height:20px}
+.guidetext{flex:1;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
+.guidetext b{color:var(--ink)}
+.guidecta{flex:none;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--accent);white-space:nowrap}
+.guidecta svg{width:16px;height:16px}
+@media(max-width:640px){.guidecard{flex-wrap:wrap;padding:16px}.guidetext{order:2;flex:1 1 100%}.guidecta{order:3}}
+
 /* ============ LIFESTYLE BLOCKS ============ */
 .lifeband{padding:52px 0 0}
 .lifehead{text-align:center;max-width:56ch;margin:0 auto 22px}
@@ -720,6 +732,14 @@ body:has(.mvh-root){margin:0}
       <div class="devrow" id="devrow"></div>
     </div>
   </div></div>
+
+  <section class="guideband"><div class="wrap">
+    <a class="guidecard" href="https://www.maviehauz.com/guide">
+      <span class="guideicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg></span>
+      <span class="guidetext"><b>New to smart home?</b> Our $9 Starter Guide helps you pick the right gear for your space — plus 2 free printable cheat sheets.</span>
+      <span class="guidecta">Get the guide<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </div></section>
 
   <section class="lifeband"><div class="wrap">
     <div class="lifehead">
